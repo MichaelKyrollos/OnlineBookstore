@@ -92,8 +92,7 @@ public class User {
                 "3/ Publisher\n" +
                 "4/ ISBN\n" +
                 "5/ Genre\n" );
-        do {
-            try {
+
                 switch ((input.nextInt())) {
                     case 0:
                         userMenu();
@@ -125,14 +124,8 @@ public class User {
                             searchByGenre(input.nextLine());}
                         break;
                 }
-            }
-            catch(InputMismatchException e) {
-                System.out.println("Please enter a valid input");
-                userSearch();
-            }
 
-        } while (!input.hasNextInt());
-    }
+        }
 
     public void searchByAuthor(int nextInt) {
     }
