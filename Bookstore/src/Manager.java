@@ -5,7 +5,7 @@ public class Manager {
     Bookstore bookstore;
 
     public Manager(Bookstore bookstore) {
-
+        this.bookstore = bookstore;
     }
 
     public void managerLogin() {
