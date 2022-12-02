@@ -1,3 +1,5 @@
+import java.sql.Connection;
+import java.sql.DriverManager;
 import java.util.InputMismatchException;
 import java.util.Scanner;
 
@@ -19,8 +21,11 @@ public class Manager {
             try {
                 switch ((input.nextInt())) {
                     case 0:
+                        bookstore.printWelcome();
+
                     case 5:
                         bookstore.printWelcome();
+
                     case 1:
                         managerAddBook();
                         break;
@@ -49,6 +54,29 @@ public class Manager {
 
 
     public void addPublisher() {
+
+        Scanner input = new Scanner(System.in);
+        String email;
+        String name;
+        String address;
+        String bankingInfo;
+
+        System.out.println("\n------------------\n" +
+                "ADD PUBLISHER \n" +
+                "------------------" );
+        do {
+            System.out.println("Email: ");
+            email = input.nextLine();
+            System.out.println("Name: ");
+            name = input.nextLine();
+            System.out.println("Address: ");
+            address = input.nextLine();
+            System.out.println("Banking Info: ");
+            bankingInfo = input.nextLine();
+            addPublisherToDB(email, name, address, bankingInfo);
+
+        } while ( input.hasNextInt() );
+
     }
 
     public void generateReport() {
@@ -59,6 +87,26 @@ public class Manager {
     }
 
     public void managerAddBook() {
+    }
+
+    public void addPublisherToDB(String email, String name, String address, String bankingInfo) {
+        System.out.println("Adding to Database...");
+        Connection connection;
+        {
+            try {
+                Class.forName("org.postgresql.Driver");
+                connection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/Assignment2", "postgres", "admin");
+
+                if (connection != null) {
+                    System.out.println("Connection OK");
+                } else {
+                    System.out.println("Failed");
+                }
+            } catch (Exception e) {
+                System.out.println(e);
+            }
+        }
+        managerLogin();
     }
 
 
