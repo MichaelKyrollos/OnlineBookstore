@@ -56,14 +56,15 @@ public class Manager {
     public void addPublisher() {
 
         Scanner input = new Scanner(System.in);
-        String email;
-        String name;
-        String address;
-        String bankingInfo;
+        String email = "";
+        String name = "";
+        String address = "";
+        String bankingInfo = "";
 
         System.out.println("\n------------------\n" +
                 "ADD PUBLISHER \n" +
                 "------------------" );
+        /*
         do {
             System.out.println("Email: ");
             email = input.nextLine();
@@ -73,10 +74,31 @@ public class Manager {
             address = input.nextLine();
             System.out.println("Banking Info: ");
             bankingInfo = input.nextLine();
-            addPublisherToDB(email, name, address, bankingInfo);
+            //addPublisherToDB(email, name, address, bankingInfo);
+            if (!email.isEmpty() && !name.isEmpty() && !address.isEmpty() && !bankingInfo.isEmpty()) {
+                System.out.println("testing the break\n");
+                System.out.println("email = " + email);
+                System.out.println("name = " + name);
+                System.out.println("address = " + address);
+                System.out.println("bank = " + bankingInfo);
+                break;
+            }
 
-        } while ( input.hasNextInt() );
+        } while (input.hasNext());*/
 
+        while (email.isEmpty() || name.isEmpty() || address.isEmpty() || bankingInfo.isEmpty()) {
+            System.out.println("Email: ");
+            email = input.nextLine();
+            System.out.println("Name: ");
+            name = input.nextLine();
+            System.out.println("Address: ");
+            address = input.nextLine();
+            System.out.println("Banking Info: ");
+            bankingInfo = input.nextLine();
+            if (email.isEmpty() || name.isEmpty() || address.isEmpty() || bankingInfo.isEmpty())
+                System.out.println("Please enter a valid input.\n");
+        }
+        addPublisherToDB(email, name, address, bankingInfo);
     }
 
     public void generateReport() {
