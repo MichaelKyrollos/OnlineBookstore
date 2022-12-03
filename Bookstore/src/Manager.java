@@ -109,9 +109,58 @@ public class Manager {
     }
 
     public void managerAddBook() {
+        Scanner input = new Scanner(System.in);
+        String isbn = "";
+        String name = "";
+        String publisher = "";
+        String quantity = "";
+        String price = "";
+        String pages = "";
+
+        System.out.println("\n------------------\n" +
+                "ADD BOOK \n" +
+                "------------------" );
+
+        while (isbn.isEmpty() || name.isEmpty() || publisher.isEmpty() || quantity.isEmpty() || price.isEmpty() || pages.isEmpty()) {
+            System.out.println("ISBN: ");
+            isbn = input.nextLine();
+            System.out.println("Name: ");
+            name = input.nextLine();
+            System.out.println("Publisher: ");
+            publisher = input.nextLine();
+            System.out.println("Quantity: ");
+            quantity = input.nextLine();
+            System.out.println("Price: ");
+            price = input.nextLine();
+            System.out.println("Pages: ");
+            pages = input.nextLine();
+            if (isbn.isEmpty() || name.isEmpty() || publisher.isEmpty() || quantity.isEmpty() || price.isEmpty() || pages.isEmpty())
+                System.out.println("Please enter a valid input.\n");
+        }
+        addBookToDB(isbn, name, publisher, quantity, price, pages);
     }
 
     public void addPublisherToDB(String email, String name, String address, String bankingInfo) {
+        System.out.println("Adding to Database...");
+        Connection connection;
+        {
+            try {
+                Class.forName("org.postgresql.Driver");
+                connection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/Assignment2", "postgres", "admin");
+
+                if (connection != null) {
+                    System.out.println("Connection OK");
+                } else {
+                    System.out.println("Failed");
+                }
+            } catch (Exception e) {
+                System.out.println(e);
+            }
+        }
+        managerLogin();
+    }
+
+    public void addBookToDB(String isbn, String name, String publisher, String quantity, String price, String pages) {
         System.out.println("Adding to Database...");
         Connection connection;
         {
