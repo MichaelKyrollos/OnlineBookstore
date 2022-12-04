@@ -87,13 +87,13 @@ public class Manager {
         } while (input.hasNext());*/
 
         while (email.isEmpty() || name.isEmpty() || address.isEmpty() || bankingInfo.isEmpty()) {
-            System.out.println("Email: ");
+            System.out.print("Email: ");
             email = input.nextLine();
-            System.out.println("Name: ");
+            System.out.print("Name: ");
             name = input.nextLine();
-            System.out.println("Address: ");
+            System.out.print("Address: ");
             address = input.nextLine();
-            System.out.println("Banking Info: ");
+            System.out.print("Banking Info: ");
             bankingInfo = input.nextLine();
             if (email.isEmpty() || name.isEmpty() || address.isEmpty() || bankingInfo.isEmpty())
                 System.out.println("Please enter a valid input.\n");
@@ -105,7 +105,35 @@ public class Manager {
     }
 
     public void deleteBook() {
-        
+        Scanner input = new Scanner(System.in);
+        String isbn = "";
+        String name = "";
+        String publisher = "";
+        String quantity = "";
+        String price = "";
+        String pages = "";
+
+        System.out.println("\n------------------\n" +
+                "REMOVE BOOK \n" +
+                "------------------" );
+
+        while (isbn.isEmpty() || name.isEmpty() || publisher.isEmpty() || quantity.isEmpty() || price.isEmpty() || pages.isEmpty()) {
+            System.out.print("ISBN: ");
+            isbn = input.nextLine();
+            System.out.print("Name: ");
+            name = input.nextLine();
+            System.out.print("Publisher: ");
+            publisher = input.nextLine();
+            System.out.print("Quantity: ");
+            quantity = input.nextLine();
+            System.out.print("Price: ");
+            price = input.nextLine();
+            System.out.print("Pages: ");
+            pages = input.nextLine();
+            if (isbn.isEmpty() || name.isEmpty() || publisher.isEmpty() || quantity.isEmpty() || price.isEmpty() || pages.isEmpty())
+                System.out.println("Please enter a valid input.\n");
+        }
+        deleteBookFromDB(isbn, name, publisher, quantity, price, pages);
     }
 
     public void managerAddBook() {
@@ -122,17 +150,17 @@ public class Manager {
                 "------------------" );
 
         while (isbn.isEmpty() || name.isEmpty() || publisher.isEmpty() || quantity.isEmpty() || price.isEmpty() || pages.isEmpty()) {
-            System.out.println("ISBN: ");
+            System.out.print("ISBN: ");
             isbn = input.nextLine();
-            System.out.println("Name: ");
+            System.out.print("Name: ");
             name = input.nextLine();
-            System.out.println("Publisher: ");
+            System.out.print("Publisher: ");
             publisher = input.nextLine();
-            System.out.println("Quantity: ");
+            System.out.print("Quantity: ");
             quantity = input.nextLine();
-            System.out.println("Price: ");
+            System.out.print("Price: ");
             price = input.nextLine();
-            System.out.println("Pages: ");
+            System.out.print("Pages: ");
             pages = input.nextLine();
             if (isbn.isEmpty() || name.isEmpty() || publisher.isEmpty() || quantity.isEmpty() || price.isEmpty() || pages.isEmpty())
                 System.out.println("Please enter a valid input.\n");
@@ -180,7 +208,25 @@ public class Manager {
         managerLogin();
     }
 
+    public void deleteBookFromDB(String isbn, String name, String publisher, String quantity, String price, String pages) {
+        System.out.println("Removing from Database...");
+        Connection connection;
+        {
+            try {
+                Class.forName("org.postgresql.Driver");
+                connection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/Assignment2", "postgres", "admin");
 
+                if (connection != null) {
+                    System.out.println("Connection OK");
+                } else {
+                    System.out.println("Failed");
+                }
+            } catch (Exception e) {
+                System.out.println(e);
+            }
+        }
+        managerLogin();
+    }
 
 
 }
