@@ -1,12 +1,20 @@
-import java.sql.Connection;
-import java.sql.DriverManager;
+import java.sql.*;
 import java.util.*;
 
 public class User {
     Bookstore bookstore;
+    ResultSet result = null;
+
+    Statement statement;
+    Connection connection;
+
+
+
 
     public User(Bookstore bookstore) {
         this.bookstore = bookstore;
+        this.connection = null;
+
     }
 
     public void userLogin() {
@@ -26,12 +34,11 @@ public class User {
     }
     public void loginExistingUser(String userName, String password) {
         System.out.println("Logging in");
-        Connection connection;
         {
             try {
                 Class.forName("org.postgresql.Driver");
-                connection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/Assignment2", "postgres", "admin");
-
+                connection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/OnlineBookstore", "postgres", "admin");
+                statement = connection.createStatement();
                 if (connection != null) {
                     System.out.println("Connection OK");
                 } else {
@@ -199,13 +206,12 @@ public class User {
                         break;
 
                     case 3:
-                        System.out.println("What is the ISBN number of the book?");
-                        searchByISBN(input.nextInt());
-                        break;
-
-                    case 4:
                         System.out.println("What is the name of the publisher?");
                         searchByPublisher(input.nextLine());
+                        break;
+                    case 4:
+                        System.out.println("What is the ISBN number of the book?");
+                        searchByISBN(input.nextInt());
                         break;
 
                     case 5:
@@ -224,6 +230,27 @@ public class User {
     }
 
     public void searchByPublisher(String publisher) {
+        ResultSet result = null;
+
+        try {
+            result = statement.executeQuery(
+                    "SELECT * FROM book");
+            while(result.next()) {
+                System.out.println("ISBN: " + result.getString("isbn"));
+                System.out.println("Book Title: " + result.getString("name"));
+                System.out.println("Book Title: " + result.getString("publisher"));
+                System.out.println("Book Title: " + result.getInt("instock"));
+                System.out.println("Book Title: " + result.getInt("thresholdquantity"));
+                System.out.println("Book Title: " + result.getInt("percenttopublisher"));
+                System.out.println("Book Title: " + result.getFloat("price"));
+                System.out.println("Book Title: " + result.getInt("pages"));
+                System.out.println("Book Title: " + result.getInt("soldthismonth"));
+                System.out.println("Book Title: " + result.getInt("soldlastmonth"));
+                System.out.println("Book Title: " + result.getInt("amountsoldhistory"));
+            }
+        } catch (SQLException sqle) {
+            System.out.println("NOT WORKING!" + sqle);
+        }
     }
 
     public void searchByISBN(int ISBN) {
