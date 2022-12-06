@@ -199,24 +199,18 @@ public class User {
                     case 0:
                         userMenu();
                         break;
-
                     case 1:
-                        System.out.println("What is the name of the book you're looking for?");
-                        searchByName(input.nextLine());
+                        searchByName();
                         break;
-
                     case 2:
-                        System.out.println("What is the name of the author that you're searching for?");
-                        searchByAuthor(input.nextLine());
+                        searchByAuthor();
                         break;
-
                     case 3:
                         searchByPublisher();
                         break;
                     case 4:
                         searchByISBN();
                         break;
-
                     case 5:
                         System.out.println("What is the genre of the book");
                         if (input.nextLine().equals("0")) {
@@ -232,9 +226,20 @@ public class User {
         }while(!input.hasNextInt());
     }
 
-
-
-    public void searchByAuthor(String author) {
+    public void searchByAuthor() {
+        //ResultSet for books
+        ResultSet result = null;
+        Scanner input = new Scanner(System.in);
+        System.out.println("What is the name of the author?");
+        String author = input.nextLine();
+        try {
+            //The first statement is to get the books
+            result = statement.executeQuery(
+                    "select *, book.name AS bookName, publisher.name AS publisherName, author.name AS authorName from book, writtenBy, publisher, author where book.isbn = writtenBy.isbn AND book.publisher = publisher.email AND author.email = writtenBy.authEmail AND author.name LIKE '%" + author + "%'");
+            searchBook(result);
+        } catch (SQLException sqle) {
+            System.out.println("NOT WORKING!" + sqle);
+        }
     }
 
     public void searchByGenre(String genre) {
@@ -243,70 +248,84 @@ public class User {
     public void searchByPublisher() {
         //ResultSet for books
         ResultSet result = null;
-        //Result set for extra information regarding each book (author(s), genre(s))
-        ResultSet result2 = null;
         Scanner input = new Scanner(System.in);
         System.out.println("What is the name of the publisher?");
         String publisher = input.nextLine();
-        int counter = 0;
         try {
             //The first statement is to get the books
             result = statement.executeQuery(
-                    "select *, book.name AS bookName, publisher.name AS publisherName from book, writtenBy, publisher where book.isbn = writtenBy.isbn AND book.publisher = publisher.email AND publisher.name = '" + publisher + "'");
-            while(result.next()) {
-                System.out.println(counter + "." +
-                        " ISBN: " + result.getString("isbn") +
-                        " Book Name: " + result.getString("bookName") +
-                        " Price: " + result.getString("Price") +
-                        " Publisher: " + result.getString("publisherName") +
-                        " Pages: " + result.getString("pages"));
-
-                counter++;
-                //This second statement is to get the author(s) of this book
-                result2 = statement2.executeQuery("select *, author.name AS authorName\n" +
-                        "from writtenby, book, author\n" +
-                        "where book.isbn = writtenby.isbn AND writtenby.authemail = author.email AND writtenby.isbn = '"+ result.getString("isbn")  +"'");
-                    System.out.println("    Written By: ");
-                    while(result2.next()) {
-                        System.out.println("        - " + result2.getString("authorName"));
-                    }
-                //This second statement is now used to get the genre(s) of this book
-                result2 = statement2.executeQuery("select *\n" +
-                        "from genres, book\n" +
-                        "where book.isbn = genres.isbn AND genres.isbn = '"+ result.getString("isbn")  +"'");
-                System.out.println("    Genres: ");
-                while(result2.next()) {
-                    System.out.println("        - " + result2.getString("genre"));
-                }
-
-            }
+                    "select *, book.name AS bookName, publisher.name AS publisherName from book, writtenBy, publisher where book.isbn = writtenBy.isbn AND book.publisher = publisher.email AND publisher.name LIKE '%" + publisher + "%'");
+            searchBook(result);
         } catch (SQLException sqle) {
             System.out.println("NOT WORKING!" + sqle);
         }
     }
 
     public void searchByISBN() {
-        //Still working on this
+        //ResultSet for books
         ResultSet result = null;
         Scanner input = new Scanner(System.in);
-        System.out.println("What is the ISBN number of the book?");
-        int ISBN = input.nextInt();
+        System.out.println("What is ISBN of the book?");
+        String ISBN = input.nextLine();
         try {
+            //The first statement is to get the books
             result = statement.executeQuery(
-                    "SELECT * from book where book.publisher =" + ISBN);
-            while(result.next()) {
-                System.out.println("ISBN: " + result.getString("isbn"));
-
-            }
+                    "select *, book.name AS bookName, publisher.name AS publisherName from book, writtenBy, publisher where book.isbn = writtenBy.isbn AND book.publisher = publisher.email AND book.isbn LIKE '%" + ISBN + "%'");
+            searchBook(result);
         } catch (SQLException sqle) {
             System.out.println("NOT WORKING!" + sqle);
         }
     }
 
-    public void searchByName(String name) {
+    public void searchByName() {
+        //ResultSet for books
+        ResultSet result = null;
+        Scanner input = new Scanner(System.in);
+        System.out.println("What is name of the book?");
+        String name = input.nextLine();
+        try {
+            //The first statement is to get the books
+            result = statement.executeQuery(
+                    "select *, book.name AS bookName, publisher.name AS publisherName from book, writtenBy, publisher where book.isbn = writtenBy.isbn AND book.publisher = publisher.email AND book.name LIKE '%" + name + "%'");
+            searchBook(result);
+        } catch (SQLException sqle) {
+            System.out.println("NOT WORKING!" + sqle);
+        }
     }
 
+    private void searchBook(ResultSet result) throws SQLException {
+        int counter = 0;
+        ResultSet result2 = null;
+        while(result.next()) {
+            System.out.println(counter + "." +
+                    " ISBN: " + result.getString("isbn") +
+                    ", Book Name: " + result.getString("bookName") +
+                    ", Price: " + result.getString("Price") +
+                    ", Publisher: " + result.getString("publisherName") +
+                    ", Pages: " + result.getString("pages"));
+
+            counter++;
+            //This second statement is to get the author(s) of this book
+            result2 = statement2.executeQuery("select *, author.name AS authorName\n" +
+                    "from writtenby, book, author\n" +
+                    "where book.isbn = writtenby.isbn AND writtenby.authemail = author.email AND writtenby.isbn = '"+ result.getString("isbn")  +"'");
+            System.out.println("    Written By: ");
+            while(result2.next()) {
+                System.out.println("        - " + result2.getString("authorName"));
+            }
+            //This second statement is now used to get the genre(s) of this book
+            result2 = statement2.executeQuery("select *\n" +
+                    "from genres, book\n" +
+                    "where book.isbn = genres.isbn AND genres.isbn = '"+ result.getString("isbn")  +"'");
+            System.out.println("    Genres: ");
+            while(result2.next()) {
+                System.out.println("        - " + result2.getString("genre"));
+            }
+
+        }
     }
+
+}
 
 
 
