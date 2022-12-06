@@ -1,10 +1,12 @@
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.util.InputMismatchException;
-import java.util.Scanner;
+import java.sql.*;
+import java.util.*;
 
 public class Manager {
     Bookstore bookstore;
+    ResultSet result;
+    Connection connection;
+    Statement statement;
+
 
     public Manager(Bookstore bookstore) {
         this.bookstore = bookstore;
@@ -60,31 +62,12 @@ public class Manager {
         String name = "";
         String address = "";
         String bankingInfo = "";
+        String phoneQuant  = "";
+        String phonenum = "";
 
         System.out.println("\n------------------\n" +
                 "ADD PUBLISHER \n" +
                 "------------------" );
-        /*
-        do {
-            System.out.println("Email: ");
-            email = input.nextLine();
-            System.out.println("Name: ");
-            name = input.nextLine();
-            System.out.println("Address: ");
-            address = input.nextLine();
-            System.out.println("Banking Info: ");
-            bankingInfo = input.nextLine();
-            //addPublisherToDB(email, name, address, bankingInfo);
-            if (!email.isEmpty() && !name.isEmpty() && !address.isEmpty() && !bankingInfo.isEmpty()) {
-                System.out.println("testing the break\n");
-                System.out.println("email = " + email);
-                System.out.println("name = " + name);
-                System.out.println("address = " + address);
-                System.out.println("bank = " + bankingInfo);
-                break;
-            }
-
-        } while (input.hasNext());*/
 
         while (email.isEmpty() || name.isEmpty() || address.isEmpty() || bankingInfo.isEmpty()) {
             System.out.print("Email: ");
@@ -98,7 +81,28 @@ public class Manager {
             if (email.isEmpty() || name.isEmpty() || address.isEmpty() || bankingInfo.isEmpty())
                 System.out.println("Please enter a valid input.\n");
         }
-        addPublisherToDB(email, name, address, bankingInfo);
+
+
+        if (!addPublisherToDB(email, name, address, bankingInfo)) {
+            managerLogin();
+        }
+
+        while (!isInteger(phoneQuant)) {
+            System.out.println("How many phone numbers does this publisher have?");
+            phoneQuant = input.nextLine();
+            if(!isInteger(phoneQuant))
+                System.out.println("Please enter a valid number.");
+        }
+
+        for (int i = 0; i < Integer.parseInt(phoneQuant); i++) {
+            System.out.println("Phone Number #" + (i+1) + ":");
+            phonenum = input.nextLine();
+            if(!addPhoneNumToDB(phonenum, email)){
+                i--;
+                System.out.println("Please enter a valid input.");
+            }
+        }
+        managerLogin();
     }
 
     public void generateReport() {
@@ -107,33 +111,19 @@ public class Manager {
     public void deleteBook() {
         Scanner input = new Scanner(System.in);
         String isbn = "";
-        String name = "";
-        String publisher = "";
-        String quantity = "";
-        String price = "";
-        String pages = "";
 
         System.out.println("\n------------------\n" +
                 "REMOVE BOOK \n" +
                 "------------------" );
 
-        while (isbn.isEmpty() || name.isEmpty() || publisher.isEmpty() || quantity.isEmpty() || price.isEmpty() || pages.isEmpty()) {
-            System.out.print("ISBN: ");
+        while (isbn.isEmpty()) {
+            System.out.println("Please enter the ISBN of the Book you would like to remove: ");
             isbn = input.nextLine();
-            System.out.print("Name: ");
-            name = input.nextLine();
-            System.out.print("Publisher: ");
-            publisher = input.nextLine();
-            System.out.print("Quantity: ");
-            quantity = input.nextLine();
-            System.out.print("Price: ");
-            price = input.nextLine();
-            System.out.print("Pages: ");
-            pages = input.nextLine();
-            if (isbn.isEmpty() || name.isEmpty() || publisher.isEmpty() || quantity.isEmpty() || price.isEmpty() || pages.isEmpty())
-                System.out.println("Please enter a valid input.\n");
+            if (isbn.isEmpty())
+                System.out.println("Please enter a valid input!");
         }
-        deleteBookFromDB(isbn, name, publisher, quantity, price, pages);
+
+        deleteBookFromDB(isbn);
     }
 
     public void managerAddBook() {
@@ -149,7 +139,8 @@ public class Manager {
                 "ADD BOOK \n" +
                 "------------------" );
 
-        while (isbn.isEmpty() || name.isEmpty() || publisher.isEmpty() || quantity.isEmpty() || price.isEmpty() || pages.isEmpty()) {
+        while (isbn.isEmpty() || name.isEmpty() || publisher.isEmpty() || quantity.isEmpty() || price.isEmpty() || pages.isEmpty()
+                || !isInteger(quantity) || !isFloat(price) || !isInteger(pages)) {
             System.out.print("ISBN: ");
             isbn = input.nextLine();
             System.out.print("Name: ");
@@ -162,84 +153,122 @@ public class Manager {
             price = input.nextLine();
             System.out.print("Pages: ");
             pages = input.nextLine();
-            if (isbn.isEmpty() || name.isEmpty() || publisher.isEmpty() || quantity.isEmpty() || price.isEmpty() || pages.isEmpty())
+            if (isbn.isEmpty() || name.isEmpty() || publisher.isEmpty() || quantity.isEmpty() || price.isEmpty() || pages.isEmpty()
+                    || !isInteger(quantity) || !isFloat(price) || !isInteger(pages))
                 System.out.println("Please enter a valid input.\n");
         }
         addBookToDB(isbn, name, publisher, quantity, price, pages);
     }
 
-    public void addPublisherToDB(String email, String name, String address, String bankingInfo) {
-        System.out.println("Adding to Database...");
-        Connection connection;
-        {
-            try {
-                Class.forName("org.postgresql.Driver");
-                connection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/Assignment2", "postgres", "admin");
-
-                if (connection != null) {
-                    System.out.println("Connection OK");
-                } else {
-                    System.out.println("Failed");
-                }
-            } catch (Exception e) {
-                System.out.println(e);
-            }
+    public boolean addPublisherToDB(String email, String name, String address, String bankingInfo) {
+        System.out.println("Adding to database...");
+        if (!connect()) {
+            System.out.println("Error: Could not Connect to Database!");
+            return false;
         }
-        managerLogin();
+
+        try {
+            statement.executeUpdate("INSERT INTO publisher VALUES ('" + email + "', '" + name +
+                    "', '" + address + "', '" + bankingInfo + "');");
+            //System.out.println("Successfully added to Database!");
+        } catch (SQLException sqle) {
+            System.out.println("Error: Could not Add to Database!");
+            System.out.println(sqle);
+            return false;
+        }
+        return true;
+        //managerLogin();
+    }
+
+    public boolean addPhoneNumToDB(String phone, String publisher) {
+        System.out.println("Adding to database...");
+        if (!connect()) {
+            System.out.println("Error: Could not Connect to Database!");
+            return false;
+        }
+
+        try {
+            statement.executeUpdate("INSERT INTO PhoneNumbers VALUES ('" + publisher + "', '" + phone + "');");
+            //System.out.println("Successfully added to Database!");
+        } catch (SQLException sqle) {
+            System.out.println("Error: Could not Add to Database!");
+            System.out.println(sqle);
+            return false;
+        }
+        return true;
     }
 
     public void addBookToDB(String isbn, String name, String publisher, String quantity, String price, String pages) {
-        System.out.println("Adding to Database...");
-        //ResultSet result = null;
-        Connection connection;
-        {
-            try {
-                Class.forName("org.postgresql.Driver");
-                connection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/OnlineBookstore", "postgres", "admin");
-                //statement = connection.createStatement();
-                if (connection != null) {
-                    System.out.println("Connection OK");
-                } else {
-                    System.out.println("Failed");
-                }
-            } catch (Exception e) {
-                System.out.println(e);
-            }
-        }/*
+        System.out.println("Adding to database...");
+        if (!connect()) {
+            System.out.println("Error: Could not Connect to Database!");
+            return;
+        }
+
         try {
-
-            result = statement.executeQuery(
-                    "SELECT dnumber FROM department where dname = 'Administration';");
-            System.out.println("Book Title: " + result.getString("dname"));
-
-
-
+            statement.executeUpdate("INSERT INTO book VALUES ('" + isbn + "', '" + name + "', '" + publisher + "', '" + quantity + "', " + 0 + ", " +
+                    0 + ", " + Float.parseFloat(price) + ", " + Integer.parseInt(pages) + ", " + 0 + ", " + 0 + ", " + 0 + ");");
+            //System.out.println("Successfully added to Database!");
         } catch (SQLException sqle) {
-            System.out.println("NOT WORKING!" + sqle);
-        }*/
-        managerLogin();
-    }
-
-    public void deleteBookFromDB(String isbn, String name, String publisher, String quantity, String price, String pages) {
-        System.out.println("Removing from Database...");
-        Connection connection;
-        {
-            try {
-                Class.forName("org.postgresql.Driver");
-                connection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/OnlineBookstore", "postgres", "admin");
-
-                if (connection != null) {
-                    System.out.println("Connection OK");
-                } else {
-                    System.out.println("Failed");
-                }
-            } catch (Exception e) {
-                System.out.println(e);
-            }
+            System.out.println("Error: Could not Add to Database!");
+            System.out.println(sqle);
         }
         managerLogin();
     }
 
+    public void deleteBookFromDB(String isbn) {
+        System.out.println("Removing from database...");
+        if (!connect()) {
+            System.out.println("Error: Could not Connect to Database!");
+            return;
+        }
 
+        try {
+            statement.executeUpdate("DELETE FROM book WHERE (isbn='" + isbn + "');");
+            //System.out.println("Successfully removed from Database!");
+        } catch (SQLException sqle) {
+            System.out.println("Error: Could not remove from Database!");
+            System.out.println(sqle);
+        }
+        managerLogin();
+    }
+
+    public boolean connect() {
+        try {
+            Class.forName("org.postgresql.Driver");
+            connection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/OnlineBookstore", "postgres", "admin");
+            statement = connection.createStatement();
+            if (connection != null) {
+                System.out.println("Connection OK");
+                return true;
+            } else {
+                System.out.println("Failed");
+                return false;
+            }
+        } catch (Exception e) {
+            System.out.println(e);
+            return false;
+        }
+    }
+
+    public static boolean isInteger(String s) {
+        try {
+            Integer.parseInt(s);
+        } catch(NumberFormatException e) {
+            return false;
+        }
+        // only got here if we didn't return false
+        return true;
+    }
+
+    public static boolean isFloat(String s) {
+        try {
+            Float.parseFloat(s);
+        } catch(NumberFormatException e) {
+            return false;
+        }
+        // only got here if we didn't return false
+        return true;
+    }
 
 }
