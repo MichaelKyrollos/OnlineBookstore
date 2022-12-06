@@ -252,7 +252,7 @@ public class User {
         try {
             //The first statement is to get the books
             result = statement.executeQuery(
-                    "select *, book.name AS bookName, publisher.name AS publisherName, author.name AS authorName from book, author, writtenBy, publisher where book.isbn = writtenBy.isbn AND writtenBy.authEmail = author.email AND book.publisher = publisher.email AND publisher.name = '" + publisher + "'");
+                    "select *, book.name AS bookName, publisher.name AS publisherName from book, writtenBy, publisher where book.isbn = writtenBy.isbn AND book.publisher = publisher.email AND publisher.name = '" + publisher + "'");
             while(result.next()) {
                 System.out.println(counter + "." +
                         " ISBN: " + result.getString("isbn") +
