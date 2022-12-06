@@ -212,10 +212,7 @@ public class User {
                         searchByISBN();
                         break;
                     case 5:
-                        System.out.println("What is the genre of the book");
-                        if (input.nextLine().equals("0")) {
-                            searchByGenre(input.nextLine());
-                        }
+                        searchByGenre();
                         break;
                 }
             }catch(InputMismatchException e){
@@ -242,7 +239,20 @@ public class User {
         }
     }
 
-    public void searchByGenre(String genre) {
+    public void searchByGenre() {
+        //ResultSet for books
+        ResultSet result = null;
+        Scanner input = new Scanner(System.in);
+        System.out.println("What is the genre of the book");
+        String genre = input.nextLine();
+        try {
+            //The first statement is to get the books
+            result = statement.executeQuery(
+                    "select *, book.name AS bookName, publisher.name AS publisherName from book, writtenBy, publisher, genres where genres.isbn = book.isbn AND book.isbn = writtenBy.isbn AND book.publisher = publisher.email AND genres.genre LIKE '%" + genre + "%'");
+            searchBook(result);
+        } catch (SQLException sqle) {
+            System.out.println("NOT WORKING!" + sqle);
+        }
     }
 
     public void searchByPublisher() {
