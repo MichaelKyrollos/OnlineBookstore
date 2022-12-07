@@ -178,7 +178,9 @@ public class Manager {
 
         addAuthorToDB(email, name);
 
-        managerLogin();
+        //return;
+
+        //managerLogin();
     }
 
     public void addBook() {
@@ -243,43 +245,78 @@ public class Manager {
     public void addWrittenBy(String isbn, String name) {
         Scanner input = new Scanner(System.in);
         String authors = "";
-        int num = 1;
         String email = "";
 
         while (!isInteger(authors)) {
             System.out.println("How many authors does this book have?");
             authors = input.nextLine();
-            if(!isInteger(authors))
+            if(!isInteger(authors)) {
                 System.out.println("Please enter a valid number.");
+            }else if(Integer.parseInt(authors) == 0) {
+                System.out.println("Please enter a valid number.");
+            }
         }
+
+        int numAuths = Integer.parseInt(authors);
 
         System.out.println("Listing current authors in the database...");
-        try {
-            result = statement.executeQuery(
-                    "SELECT name, email FROM author;"
-            );
-            while(result.next())  {
-                System.out.println("Author #" + num++);
-                System.out.println("\tName: " + result.getString("name"));
-                System.out.println("\tEmail: " + result.getString("email"));
-            }
-            System.out.println();
-        } catch (SQLException sqle) {
-            System.out.println(sqle);
-        }
 
-        for (int i = 0; i < Integer.parseInt(authors); i++) {
-            System.out.println("Please enter the email of the author(s) of " + name + ":");
-            System.out.println("Note: If the author's name is not on this list, please enter 0 and add the author to the database");
+        while (numAuths > 0) {
+            int num = 1;
+            try {
+                result = statement.executeQuery(
+                        "SELECT name, email FROM author;"
+                );
+                while(result.next())  {
+                    System.out.println("Author #" + num++);
+                    System.out.println("\tName: " + result.getString("name"));
+                    System.out.println("\tEmail: " + result.getString("email"));
+                }
+                System.out.println();
+            } catch (SQLException sqle) {
+                System.out.println(sqle);
+            }
+
+            System.out.println("Please enter the email of the author(s) of \"" + name + "\":");
+            System.out.println("Note: If the author's name is not on this list, please enter 0 to add the author to the database");
             email = input.nextLine();
             if(Objects.equals(email, "0")) {
-                return;
+                addAuthor();
+                numAuths++;
+            } else if(!addWrittenByToDB(email, isbn)){
+                numAuths++;
+                System.out.println("Please enter a valid input.");
+            }
+            numAuths--;
+        }
+
+/*
+        for (int i = 0; i < Integer.parseInt(authors); i++) {
+            try {
+                result = statement.executeQuery(
+                        "SELECT name, email FROM author;"
+                );
+                while(result.next())  {
+                    System.out.println("Author #" + num++);
+                    System.out.println("\tName: " + result.getString("name"));
+                    System.out.println("\tEmail: " + result.getString("email"));
+                }
+                System.out.println();
+            } catch (SQLException sqle) {
+                System.out.println(sqle);
+            }
+
+            System.out.println("Please enter the email of the author(s) of " + name + ":");
+            System.out.println("Note: If the author's name is not on this list, please enter 0 to add the author to the database");
+            email = input.nextLine();
+            if(Objects.equals(email, "0")) {
+                addAuthor();
             }
             if(!addWrittenByToDB(email, isbn)){
                 i--;
                 System.out.println("Please enter a valid input.");
             }
-        }
+        }*/
         return;
     }
 
