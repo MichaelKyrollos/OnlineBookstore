@@ -371,6 +371,8 @@ public class Manager {
         System.out.println("Removing from database...");
 
         try {
+            statement.executeUpdate("DELETE FROM genres WHERE (isbn='" + isbn + "');");
+            statement.executeUpdate("DELETE FROM writtenBy WHERE (isbn='" + isbn + "');");
             statement.executeUpdate("DELETE FROM book WHERE (isbn='" + isbn + "');");
             //System.out.println("Successfully removed from Database!");
         } catch (SQLException sqle) {
