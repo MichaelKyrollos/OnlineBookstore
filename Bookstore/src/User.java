@@ -9,6 +9,8 @@ public class User {
     Statement statement2;
     Statement statement3;
     Connection connection;
+    ArrayList<Book> booksSearched;
+    ArrayList<Book> booksInCart;
 
 
 
@@ -16,6 +18,8 @@ public class User {
     public User(Bookstore bookstore) {
         this.bookstore = bookstore;
         this.connection = null;
+        booksSearched = new ArrayList<>();
+        booksInCart = new ArrayList<>();
 
     }
 
@@ -180,6 +184,10 @@ public class User {
     }
 
     private void showCartItems() {
+        for (Book b : booksInCart) {
+            System.out.println("-" + b);
+        }
+
     }
 
     public void userSearch() {
@@ -306,7 +314,21 @@ public class User {
     private void searchBook(ResultSet result) throws SQLException {
         int counter = 0;
         ResultSet result2 = null;
-        while(result.next()) {
+
+        booksSearched.clear();
+        boolean temp = result.next();
+        if (!temp) {
+            System.out.println("There are no results");
+            userSearch();
+        }
+        boolean flag = true;
+        while(flag) {
+            String ISBN = result.getString("isbn");
+            String bookName = result.getString("bookName");
+            String price = result.getString("Price");
+            String publisherName = result.getString("publisherName");
+
+
             System.out.println(counter + "." +
                     " ISBN: " + result.getString("isbn") +
                     ", Book Name: " + result.getString("bookName") +
@@ -316,12 +338,15 @@ public class User {
 
             counter++;
             //This second statement is to get the author(s) of this book
+            ArrayList<String> tempAuthor = new ArrayList<>();
+            ArrayList<String> tempGenre = new ArrayList<>();
             result2 = statement2.executeQuery("select *, author.name AS authorName\n" +
                     "from writtenby, book, author\n" +
                     "where book.isbn = writtenby.isbn AND writtenby.authemail = author.email AND writtenby.isbn = '"+ result.getString("isbn")  +"'");
             System.out.println("    Written By: ");
             while(result2.next()) {
                 System.out.println("        - " + result2.getString("authorName"));
+                tempAuthor.add(result2.getString("authorName"));
             }
             //This second statement is now used to get the genre(s) of this book
             result2 = statement2.executeQuery("select *\n" +
@@ -330,11 +355,64 @@ public class User {
             System.out.println("    Genres: ");
             while(result2.next()) {
                 System.out.println("        - " + result2.getString("genre"));
+                tempGenre.add(result2.getString("genre"));
             }
+
+            booksSearched.add(new Book(ISBN,bookName,price,publisherName,0, (ArrayList<String>) tempGenre.clone(),(ArrayList<String>) tempAuthor.clone() ));
+
+            if (!result.next()) {
+                flag = false;
+                cartOption();
+
+            }
+
 
         }
     }
 
+    private void cartOption() {
+        Scanner input = new Scanner(System.in);
+        System.out.println("Would you like to add any of the books to the cart? 0/1");
+
+        do {
+            try {
+                switch ((input.nextInt())) {
+                    case 0:
+                        userSearch();
+                        break;
+                    case 1:
+                        addToCart();
+                        break;
+                }
+            }catch(InputMismatchException e){
+                System.out.println("Please enter a valid input");
+                cartOption();
+            }
+
+        } while(!input.hasNextInt());
+
+    }
+
+    public void addToCart() {
+        Scanner input = new Scanner(System.in);
+        System.out.println("Enter the book number you would like");
+        int bookNum = input.nextInt();
+        if (bookNum < booksSearched.size()) {
+            booksInCart.add(booksSearched.get(bookNum));
+            Scanner toBuy = new Scanner(System.in);
+            System.out.println("How many would you like?");
+            booksSearched.get(bookNum).setQuantityToBuy(toBuy.nextInt());
+            System.out.println("Added to cart! \n");
+            cartOption();
+        }
+        else {
+            System.out.println("This is not a valid option");
+            addToCart();
+        }
+
+
+
+    }
 }
 
 
