@@ -378,7 +378,7 @@ public class User {
         try {
             //The first statement is to get the books
             result = statement.executeQuery(
-                    "select *, book.name AS bookName, publisher.name AS publisherName from book, writtenBy, publisher, genres where genres.isbn = book.isbn AND book.isbn = writtenBy.isbn AND book.publisher = publisher.email AND genres.genre LIKE '%" + genre + "%'");
+                    "select *, book.name AS bookName, publisher.name AS publisherName from book, publisher, genres where genres.isbn = book.isbn AND book.publisher = publisher.email AND genres.genre LIKE '%" + genre + "%'");
             searchBook(result);
         } catch (SQLException sqle) {
             System.out.println("NOT WORKING!" + sqle);
@@ -394,7 +394,7 @@ public class User {
         try {
             //The first statement is to get the books
             result = statement.executeQuery(
-                    "select *, book.name AS bookName, publisher.name AS publisherName from book, writtenBy, publisher where book.isbn = writtenBy.isbn AND book.publisher = publisher.email AND publisher.name LIKE '%" + publisher + "%'");
+                    "select *, book.name AS bookName, publisher.name AS publisherName from book, publisher where book.publisher = publisher.email AND publisher.name LIKE '%" + publisher + "%'");
             searchBook(result);
         } catch (SQLException sqle) {
             System.out.println("NOT WORKING!" + sqle);
