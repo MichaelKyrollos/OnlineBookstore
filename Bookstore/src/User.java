@@ -91,7 +91,6 @@ public class User {
         System.out.println("\n------------------\n" +
                 "  USER CART \n" +
                 "------------------\n" );
-        System.out.println("Showing cart...\n");
         System.out.println(
                 "0/ Go Back\n" +
                 "1/ Place Order\n" +
@@ -185,12 +184,12 @@ public class User {
             }
             else {
                 System.out.println("You cannot remove this much!");
-                addToCart();
+                showCartMenu();
             }
         }
         else {
             System.out.println("This is not a valid option");
-            addToCart();
+            showCartMenu();
         }
     }
 
@@ -198,8 +197,10 @@ public class User {
         Scanner input = new Scanner(System.in);
         do {
             try {
+                System.out.println("Showing book(s) in cart:");
+                showCartItems();
                 System.out.println("Which book in the cart would you like to increase the quantity of? (enter the book number)");
-                increaseQuantity(input.nextInt());
+                increaseQuantity();
             }
             catch(Exception e) {
                 System.out.println("Please enter a valid input");
@@ -208,7 +209,26 @@ public class User {
         }while(!input.hasNextInt());
     }
 
-    private void increaseQuantity(int nextInt) {
+    private void increaseQuantity() {
+        Scanner input = new Scanner(System.in);
+        int bookNum = input.nextInt();
+        System.out.println("By how much would you like to increase the quantity of the selected book?");
+        int addThisMany = input.nextInt();
+        if (bookNum < booksInCart.size()) {
+            Book selectedBook = booksInCart.get(bookNum);
+            if(0 <= addThisMany && addThisMany + selectedBook.getQuantitiy()  <= selectedBook.getStock()) {
+                selectedBook.setQuantityToBuy(selectedBook.getQuantitiy() + addThisMany);
+                showCartMenu();
+            }
+            else {
+                System.out.println("You cannot add this much!");
+                showCartMenu();
+            }
+        }
+        else {
+            System.out.println("This is not a valid option");
+            addToCart();
+        }
     }
 
     private void placeOrder() {
