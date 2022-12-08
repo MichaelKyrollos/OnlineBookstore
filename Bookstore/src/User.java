@@ -2,17 +2,13 @@ import java.sql.*;
 import java.util.*;
 
 public class User {
-    Bookstore bookstore;
-    ResultSet result = null;
-    Statement statement;
-    Statement statement2;
-    Statement statement3;
-    Connection connection;
-    ArrayList<Book> booksSearched;
-    ArrayList<Book> booksInCart;
-
-
-    String username;
+    private final Bookstore bookstore;
+    private Statement statement;
+    private Statement statement2;
+    private Connection connection;
+    private ArrayList<Book> booksSearched;
+    private ArrayList<Book> booksInCart;
+    private String username;
 
 
     public User(Bookstore bookstore) {
@@ -25,6 +21,11 @@ public class User {
     public void setUsername(String username) {
         this.username = username;
     }
+
+    public String getUsername() {
+        return username;
+    }
+
     public void userLogin() {
 
         Scanner input = new Scanner(System.in);
@@ -40,6 +41,53 @@ public class User {
                 loginExistingUser(userName,password);
         } while (input.hasNextInt());
     }
+    public void newUser() {
+        Scanner input = new Scanner(System.in);
+        String username;
+        String password;
+        String address;
+        do {
+            System.out.println("Please enter a unique username");
+            username = input.nextLine();
+            System.out.println("Please enter a password");
+            password = input.nextLine();
+            System.out.println("Enter your home address");
+            address = input.nextLine();
+        } while (username.isEmpty() || password.isEmpty() || address.isEmpty());
+
+        if (addAddress(username,password,address)) {
+            System.out.println("User successfully added");
+            this.setUsername(username);
+            userMenu();
+        }
+        else {
+            System.out.println("That did not work, try again");
+            bookstore.printWelcome();
+        }
+
+    }
+
+    private boolean addAddress(String username, String password, String address)  {
+        try {
+            ResultSet result = null;
+            Class.forName("org.postgresql.Driver");
+            connection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/OnlineBookstore", "postgres", "admin");
+            statement = connection.createStatement();
+
+            if (connection != null) {
+                try {
+                    statement.executeUpdate(
+                            "INSERT INTO \"user\" VALUES ('" + username+ "', '" + password +  "', '" + address + "');");
+                }
+                catch (SQLException sqle) {
+                    return false;
+                }
+            }
+         } catch (SQLException | ClassNotFoundException sqle) {
+            return false;
+        }
+        return true;
+}
     public void loginExistingUser(String userName, String password) {
         {
             try {
@@ -53,19 +101,23 @@ public class User {
                     try {
                         result.next();
                         if (password.equals(result.getString("password"))) {
-                            System.out.println("Connection to DB");
+                            System.out.println("Connection to DB successful");
                             System.out.println("Logged in");
+                            this.setUsername(userName);
                         }
                     }
                     catch (Exception e) {
                         System.out.println("Incorrect username or password");
+                        bookstore.printWelcome();
                     }
                 }
                 else {
                     System.out.println("Failed Connection to DB");
+                    bookstore.printWelcome();
                 }
             } catch (Exception e) {
                 System.out.println(e);
+                bookstore.printWelcome();
             }
         }
         userMenu();
@@ -74,8 +126,9 @@ public class User {
     public void userMenu() {
         Scanner input = new Scanner(System.in);
         System.out.println("\n------------------\n" +
-                "USER MENU \n" +
+                "  USER MENU \n" +
                 "------------------" );
+        System.out.println("Hello  " + getUsername());
         System.out.println("1/ Search\n" + "2/ Go to Cart\n" + "3/ Logout\n" );
         do {
             try {
@@ -249,7 +302,7 @@ public class User {
 
     public void searchByAuthor() {
         //ResultSet for books
-        ResultSet result = null;
+        ResultSet result;
         Scanner input = new Scanner(System.in);
         System.out.println("What is the name of the author?");
         String author = input.nextLine();
@@ -265,7 +318,7 @@ public class User {
 
     public void searchByGenre() {
         //ResultSet for books
-        ResultSet result = null;
+        ResultSet result;
         Scanner input = new Scanner(System.in);
         System.out.println("What is the genre of the book");
         String genre = input.nextLine();
@@ -281,7 +334,7 @@ public class User {
 
     public void searchByPublisher() {
         //ResultSet for books
-        ResultSet result = null;
+        ResultSet result;
         Scanner input = new Scanner(System.in);
         System.out.println("What is the name of the publisher?");
         String publisher = input.nextLine();
@@ -344,7 +397,6 @@ public class User {
             String price = result.getString("Price");
             String publisherName = result.getString("publisherName");
             int quantityStock = result.getInt("inStock");
-
 
             System.out.println(counter + "." +
                     " ISBN: " + ISBN +
