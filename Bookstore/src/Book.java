@@ -7,29 +7,29 @@ public class Book {
 
     private String ISBN;
     private String name;
+    private String price;
+    private String publisher;
+    private int quantityToBuy;
 
-    public Book(String ISBN, String name, String price, String publisher, int quantityToBuy, ArrayList<String> genre, ArrayList<String> author) {
+    public int getInStock() {
+        return inStock;
+    }
+
+    private int inStock;
+    private ArrayList<String> genre;
+    private ArrayList<String> author;
+
+
+    public Book(String ISBN, String name, String price, String publisher, int quantityToBuy, int inStock, ArrayList<String> genre, ArrayList<String> author) {
         this.ISBN = ISBN;
         this.name = name;
         this.price = price;
         this.publisher = publisher;
         this.quantityToBuy = quantityToBuy;
+        this.inStock = inStock;
         this.genre = genre;
         this.author = author;
     }
-
-    private String price;
-
-
-
-    private String publisher;
-
-
-    private int quantityToBuy;
-    private ArrayList<String> genre;
-    private ArrayList<String> author;
-
-
 
     public void setQuantityToBuy(int quantityToBuy) {
         this.quantityToBuy = quantityToBuy;
@@ -38,14 +38,22 @@ public class Book {
 
     @Override
     public String toString() {
-        return "Book" +
-                "ISBN:" + ISBN +
+        String printGenre="";
+        for (String s : genre) {
+            printGenre+="\n      - " + s;
+
+        }
+        String printAuthor="";
+        for (String s : author) {
+            printAuthor+="\n      - " + s;
+        }
+        return  "ISBN:" + ISBN +
                 ", Book name:" + name +
                 ", Price:" + price +
-                ", Publisher:" + publisher +
-                "\n    Quantity: " + quantityToBuy +
-                "\n     genre:" + genre +
-                "   \nauthor(s):" + author +
+                ", Publisher: " + publisher +
+                ", Quantity: " + quantityToBuy +
+                "\n    Genre:" + printGenre +
+                "\n    Author(s):" + printAuthor +
                 '\n';
     }
 }
