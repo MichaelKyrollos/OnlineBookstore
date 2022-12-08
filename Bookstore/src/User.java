@@ -29,6 +29,7 @@ public class User {
     public void userLogin() {
 
         Scanner input = new Scanner(System.in);
+        booksInCart.clear();
 
         System.out.println("\n------------------\n" +
                 "USER LOGIN \n" +
@@ -104,23 +105,23 @@ public class User {
                             System.out.println("Connection to DB successful");
                             System.out.println("Logged in");
                             this.setUsername(userName);
+                            userMenu();
+                        }
+                        else {
+                            System.out.println("Failed Connection to DB");
+                            bookstore.printWelcome();
                         }
                     }
-                    catch (Exception e) {
-                        System.out.println("Incorrect username or password");
-                        bookstore.printWelcome();
+                    catch (SQLException sqle) {
+                        System.out.println(sqle);
                     }
                 }
-                else {
-                    System.out.println("Failed Connection to DB");
-                    bookstore.printWelcome();
-                }
+
             } catch (Exception e) {
                 System.out.println(e);
                 bookstore.printWelcome();
             }
         }
-        userMenu();
     }
 
     public void userMenu() {
@@ -213,7 +214,6 @@ public class User {
         int bookNum = input.nextInt();
         if (bookNum < booksInCart.size()) {
             booksInCart.remove(bookNum);
-            System.out.println("This is not a valid option");
             showCartMenu();
         }
         else {
