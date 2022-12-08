@@ -129,7 +129,7 @@ public class User {
                 "  USER MENU \n" +
                 "------------------" );
         System.out.println("Hello " + getUsername());
-        System.out.println("1/ Search\n" + "2/ Go to Cart\n" + "3/ Logout\n" );
+        System.out.println("0/ To Exit\n1/ Search\n" + "2/ Go to Cart\n" + "3/ Logout\n" );
         do {
             try {
                 switch ((input.nextInt())) {
@@ -318,7 +318,7 @@ public class User {
                 "  SEARCH BY: \n" +
                 "------------------");
         System.out.println(
-                "1/ Book Name\n" +
+                "0/ To Exit\n1/ Book Name\n" +
                         "2/ Author Name\n" +
                         "3/ Publisher\n" +
                         "4/ ISBN\n" +
@@ -494,7 +494,7 @@ public class User {
 
     private void cartOption() {
         Scanner input = new Scanner(System.in);
-        System.out.println("Would you like to add any of the books to the cart? 0/1");
+        System.out.println("Would you like to add any of the books to the cart? 0 for NO, 1 for YES");
         do {
             try {
                 switch ((input.nextInt())) {
