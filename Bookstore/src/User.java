@@ -29,6 +29,7 @@ public class User {
     public void userLogin() {
 
         Scanner input = new Scanner(System.in);
+        booksInCart.clear();
 
         System.out.println("\n------------------\n" +
                 "USER LOGIN \n" +
@@ -104,23 +105,23 @@ public class User {
                             System.out.println("Connection to DB successful");
                             System.out.println("Logged in");
                             this.setUsername(userName);
+                            userMenu();
+                        }
+                        else {
+                            System.out.println("Failed Connection to DB");
+                            bookstore.printWelcome();
                         }
                     }
-                    catch (Exception e) {
-                        System.out.println("Incorrect username or password");
-                        bookstore.printWelcome();
+                    catch (SQLException sqle) {
+                        System.out.println(sqle);
                     }
                 }
-                else {
-                    System.out.println("Failed Connection to DB");
-                    bookstore.printWelcome();
-                }
+
             } catch (Exception e) {
                 System.out.println(e);
                 bookstore.printWelcome();
             }
         }
-        userMenu();
     }
 
     public void userMenu() {
@@ -129,7 +130,7 @@ public class User {
                 "  USER MENU \n" +
                 "------------------" );
         System.out.println("Hello " + getUsername());
-        System.out.println("1/ Search\n" + "2/ Go to Cart\n" + "3/ Logout\n" );
+        System.out.println("0/ To Exit\n1/ Search\n" + "2/ Go to Cart\n" + "3/ Logout\n" );
         do {
             try {
                 switch ((input.nextInt())) {
@@ -213,7 +214,6 @@ public class User {
         int bookNum = input.nextInt();
         if (bookNum < booksInCart.size()) {
             booksInCart.remove(bookNum);
-            System.out.println("This is not a valid option");
             showCartMenu();
         }
         else {
@@ -318,7 +318,7 @@ public class User {
                 "  SEARCH BY: \n" +
                 "------------------");
         System.out.println(
-                "1/ Book Name\n" +
+                "0/ To Exit\n1/ Book Name\n" +
                         "2/ Author Name\n" +
                         "3/ Publisher\n" +
                         "4/ ISBN\n" +
@@ -410,7 +410,7 @@ public class User {
         try {
             //The first statement is to get the books
             result = statement.executeQuery(
-                    "select *, book.name AS bookName, publisher.name AS publisherName from book, writtenBy, publisher where book.isbn = writtenBy.isbn AND book.publisher = publisher.email AND book.isbn LIKE '%" + ISBN + "%'");
+                    "select *, book.name AS bookName, publisher.name AS publisherName from book, publisher where book.publisher = publisher.email AND book.isbn LIKE '%" + ISBN + "%'");
             searchBook(result);
         } catch (SQLException sqle) {
             System.out.println("NOT WORKING!" + sqle);
@@ -426,7 +426,7 @@ public class User {
         try {
             //The first statement is to get the books
             result = statement.executeQuery(
-                    "select *, book.name AS bookName, publisher.name AS publisherName from book, writtenBy, publisher where book.isbn = writtenBy.isbn AND book.publisher = publisher.email AND book.name LIKE '%" + name + "%'");
+                    "select *, book.name AS bookName, publisher.name AS publisherName from book, publisher where book.publisher = publisher.email AND book.name LIKE '%"+ name +"%'");
             searchBook(result);
         } catch (SQLException sqle) {
             System.out.println("NOT WORKING!" + sqle);
@@ -494,7 +494,7 @@ public class User {
 
     private void cartOption() {
         Scanner input = new Scanner(System.in);
-        System.out.println("Would you like to add any of the books to the cart? 0/1");
+        System.out.println("Would you like to add any of the books to the cart? 0 for NO, 1 for YES");
         do {
             try {
                 switch ((input.nextInt())) {

@@ -35,7 +35,7 @@ public class Manager {
         System.out.println("------------------\n" +
                 "  MANAGER LOGIN \n" +
                 "------------------\n" );
-        System.out.println("1/ Add author\n" +  "2/ Add book\n" + "3/ Delete book\n" +
+        System.out.println("0/ To Exit\n1/ Add author\n" +  "2/ Add book\n" + "3/ Delete book\n" +
                 "4/ Add publisher\n" + "5/ Generate report\n" + "6/ Logout\n");
         do {
             try {
