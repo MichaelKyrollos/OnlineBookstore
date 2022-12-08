@@ -45,6 +45,7 @@ public class Manager {
 
                     case 1:
                         addAuthor();
+                        managerLogin();
                         break;
 
                     case 2:
