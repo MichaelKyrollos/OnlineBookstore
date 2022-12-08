@@ -4,7 +4,6 @@ import java.util.*;
 public class User {
     Bookstore bookstore;
     ResultSet result = null;
-
     Statement statement;
     Statement statement2;
     Statement statement3;
@@ -13,14 +12,19 @@ public class User {
     ArrayList<Book> booksInCart;
 
 
+    String username;
+
+
     public User(Bookstore bookstore) {
         this.bookstore = bookstore;
         this.connection = null;
         booksSearched = new ArrayList<>();
         booksInCart = new ArrayList<>();
-
     }
 
+    public void setUsername(String username) {
+        this.username = username;
+    }
     public void userLogin() {
 
         Scanner input = new Scanner(System.in);
@@ -37,18 +41,28 @@ public class User {
         } while (input.hasNextInt());
     }
     public void loginExistingUser(String userName, String password) {
-        System.out.println("Logging in");
         {
             try {
+                ResultSet result = null;
                 Class.forName("org.postgresql.Driver");
                 connection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/OnlineBookstore", "postgres", "admin");
                 statement = connection.createStatement();
-                statement2 = connection.createStatement();
-                statement3 = connection.createStatement();
+                result = statement.executeQuery(
+                        "select *, username AS usernames from \"user\"  where (username='" + userName + "')");
                 if (connection != null) {
-                    System.out.println("Connection OK");
-                } else {
-                    System.out.println("Failed");
+                    try {
+                        result.next();
+                        if (password.equals(result.getString("password"))) {
+                            System.out.println("Connection to DB");
+                            System.out.println("Logged in");
+                        }
+                    }
+                    catch (Exception e) {
+                        System.out.println("Incorrect username or password");
+                    }
+                }
+                else {
+                    System.out.println("Failed Connection to DB");
                 }
             } catch (Exception e) {
                 System.out.println(e);
@@ -367,7 +381,6 @@ public class User {
             if (!result.next()) {
                 flag = false;
                 cartOption();
-
             }
 
 
