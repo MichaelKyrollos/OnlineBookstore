@@ -2,23 +2,14 @@ import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 public class Book {
-
-
-
     private String ISBN;
     private String name;
     private String price;
     private String publisher;
     private int quantityToBuy;
-
-    public int getInStock() {
-        return inStock;
-    }
-
     private int inStock;
     private ArrayList<String> genre;
     private ArrayList<String> author;
-
 
     public Book(String ISBN, String name, String price, String publisher, int quantityToBuy, int inStock, ArrayList<String> genre, ArrayList<String> author) {
         this.ISBN = ISBN;
@@ -33,6 +24,12 @@ public class Book {
 
     public void setQuantityToBuy(int quantityToBuy) {
         this.quantityToBuy = quantityToBuy;
+    }
+    public int getQuantitiy(){ return quantityToBuy ;}
+    public int getStock(){ return inStock ;}
+
+    public int getInStock() {
+        return inStock;
     }
 
     @Override

@@ -2,15 +2,13 @@ import java.sql.*;
 import java.util.*;
 
 public class User {
-    Bookstore bookstore;
-    ResultSet result = null;
-
-    Statement statement;
-    Statement statement2;
-    Statement statement3;
-    Connection connection;
-    ArrayList<Book> booksSearched;
-    ArrayList<Book> booksInCart;
+    private final Bookstore bookstore;
+    private Statement statement;
+    private Statement statement2;
+    private Connection connection;
+    private ArrayList<Book> booksSearched;
+    private ArrayList<Book> booksInCart;
+    private String username;
 
 
     public User(Bookstore bookstore) {
@@ -18,7 +16,14 @@ public class User {
         this.connection = null;
         booksSearched = new ArrayList<>();
         booksInCart = new ArrayList<>();
+    }
 
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public String getUsername() {
+        return username;
     }
 
     public void userLogin() {
@@ -36,22 +41,83 @@ public class User {
                 loginExistingUser(userName,password);
         } while (input.hasNextInt());
     }
+    public void newUser() {
+        Scanner input = new Scanner(System.in);
+        String username;
+        String password;
+        String address;
+        do {
+            System.out.println("Please enter a unique username");
+            username = input.nextLine();
+            System.out.println("Please enter a password");
+            password = input.nextLine();
+            System.out.println("Enter your home address");
+            address = input.nextLine();
+        } while (username.isEmpty() || password.isEmpty() || address.isEmpty());
+
+        if (registerAccount(username,password,address)) {
+            System.out.println("User successfully added");
+            this.setUsername(username);
+            userMenu();
+        }
+        else {
+            System.out.println("That did not work, try again");
+            bookstore.printWelcome();
+        }
+
+    }
+
+    private boolean registerAccount(String username, String password, String address)  {
+        try {
+            ResultSet result = null;
+            Class.forName("org.postgresql.Driver");
+            connection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/OnlineBookstore", "postgres", "admin");
+            statement = connection.createStatement();
+            if (connection != null) {
+                try {
+                    statement.executeUpdate(
+                            "INSERT INTO \"user\" VALUES ('" + username+ "', '" + password +  "', '" + address + "');");
+                }
+                catch (SQLException sqle) {
+                    return false;
+                }
+            }
+         } catch (SQLException | ClassNotFoundException sqle) {
+            return false;
+        }
+        return true;
+}
     public void loginExistingUser(String userName, String password) {
-        System.out.println("Logging in");
         {
             try {
+                ResultSet result = null;
                 Class.forName("org.postgresql.Driver");
                 connection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/OnlineBookstore", "postgres", "admin");
                 statement = connection.createStatement();
                 statement2 = connection.createStatement();
-                statement3 = connection.createStatement();
+                result = statement.executeQuery(
+                        "select *, username AS usernames from \"user\"  where (username='" + userName + "')");
                 if (connection != null) {
-                    System.out.println("Connection OK");
-                } else {
-                    System.out.println("Failed");
+                    try {
+                        result.next();
+                        if (password.equals(result.getString("password"))) {
+                            System.out.println("Connection to DB successful");
+                            System.out.println("Logged in");
+                            this.setUsername(userName);
+                        }
+                    }
+                    catch (Exception e) {
+                        System.out.println("Incorrect username or password");
+                        bookstore.printWelcome();
+                    }
+                }
+                else {
+                    System.out.println("Failed Connection to DB");
+                    bookstore.printWelcome();
                 }
             } catch (Exception e) {
                 System.out.println(e);
+                bookstore.printWelcome();
             }
         }
         userMenu();
@@ -60,8 +126,9 @@ public class User {
     public void userMenu() {
         Scanner input = new Scanner(System.in);
         System.out.println("\n------------------\n" +
-                "USER MENU \n" +
+                "  USER MENU \n" +
                 "------------------" );
+        System.out.println("Hello " + getUsername());
         System.out.println("1/ Search\n" + "2/ Go to Cart\n" + "3/ Logout\n" );
         do {
             try {
@@ -74,7 +141,7 @@ public class User {
                         userSearch();
                         break;
                     case 2:
-                        showUserCart();
+                        showCartMenu();
                         break;
                 }
             }
@@ -86,13 +153,11 @@ public class User {
         } while (!input.hasNextInt());
     }
 
-    public void showUserCart() {
+    public void showCartMenu() {
         Scanner input = new Scanner(System.in);
         System.out.println("\n------------------\n" +
                 "  USER CART \n" +
                 "------------------\n" );
-        System.out.println("Showing cart...\n");
-        showCartItems();
         System.out.println(
                 "0/ Go Back\n" +
                 "1/ Place Order\n" +
@@ -121,7 +186,7 @@ public class User {
             }
             catch(InputMismatchException e) {
                 System.out.println("Please enter a valid input");
-                showUserCart();
+                showCartMenu();
             }
 
         } while (!input.hasNextInt());
@@ -131,8 +196,10 @@ public class User {
         Scanner input = new Scanner(System.in);
         do {
             try {
+                System.out.println("Showing book(s) in cart:");
+                showCartItems();
                 System.out.println("Which book would you like to remove from cart? (enter the book number)");
-                removeFromCart(input.nextInt());
+                removeFromCart();
             }
             catch(InputMismatchException e) {
                 System.out.println("Please enter a valid input");
@@ -141,15 +208,28 @@ public class User {
         }while(!input.hasNextInt());
     }
 
-    private void removeFromCart(int nextInt) {
+    private void removeFromCart() throws InputMismatchException{
+        Scanner input = new Scanner(System.in);
+        int bookNum = input.nextInt();
+        if (bookNum < booksInCart.size()) {
+            booksInCart.remove(bookNum);
+            System.out.println("This is not a valid option");
+            showCartMenu();
+        }
+        else {
+            System.out.println("This is not a valid option");
+            addToCart();
+        }
     }
 
     private void decreaseQuantityPrompt() {
         Scanner input = new Scanner(System.in);
         do {
             try {
+                System.out.println("Showing book(s) in cart:");
+                showCartItems();
                 System.out.println("Which book in the cart would you like to decrease the quantity of? (enter the book number)");
-                decreaseQuantity(input.nextInt());
+                decreaseQuantity();
             }
             catch(Exception e) {
                 System.out.println("Please enter a valid input");
@@ -158,15 +238,36 @@ public class User {
         }while(!input.hasNextInt());
     }
 
-    private void decreaseQuantity(int nextInt) {
+    private void decreaseQuantity() {
+        Scanner input = new Scanner(System.in);
+        int bookNum = input.nextInt();
+        System.out.println("By how much would you like to decrease the quantity of the selected book?");
+        int removeThisMany = input.nextInt();
+        if (bookNum < booksInCart.size()) {
+            Book selectedBook = booksInCart.get(bookNum);
+            if(0 <= removeThisMany && removeThisMany <= selectedBook.getQuantitiy()) {
+                selectedBook.setQuantityToBuy(selectedBook.getQuantitiy() - removeThisMany);
+                showCartMenu();
+            }
+            else {
+                System.out.println("You cannot remove this much!");
+                showCartMenu();
+            }
+        }
+        else {
+            System.out.println("This is not a valid option");
+            showCartMenu();
+        }
     }
 
     private void increaseQuantityPrompt() {
         Scanner input = new Scanner(System.in);
         do {
             try {
+                System.out.println("Showing book(s) in cart:");
+                showCartItems();
                 System.out.println("Which book in the cart would you like to increase the quantity of? (enter the book number)");
-                increaseQuantity(input.nextInt());
+                increaseQuantity();
             }
             catch(Exception e) {
                 System.out.println("Please enter a valid input");
@@ -175,7 +276,26 @@ public class User {
         }while(!input.hasNextInt());
     }
 
-    private void increaseQuantity(int nextInt) {
+    private void increaseQuantity() {
+        Scanner input = new Scanner(System.in);
+        int bookNum = input.nextInt();
+        System.out.println("By how much would you like to increase the quantity of the selected book?");
+        int addThisMany = input.nextInt();
+        if (bookNum < booksInCart.size()) {
+            Book selectedBook = booksInCart.get(bookNum);
+            if(0 <= addThisMany && addThisMany + selectedBook.getQuantitiy()  <= selectedBook.getStock()) {
+                selectedBook.setQuantityToBuy(selectedBook.getQuantitiy() + addThisMany);
+                showCartMenu();
+            }
+            else {
+                System.out.println("You cannot add this much!");
+                showCartMenu();
+            }
+        }
+        else {
+            System.out.println("This is not a valid option");
+            addToCart();
+        }
     }
 
     private void placeOrder() {
@@ -186,8 +306,8 @@ public class User {
             System.out.println("There is nothing in the cart");
         }
         else {
-            for (Book b : booksInCart) {
-                System.out.println("-" + b);
+            for (int i = 0 ; i < booksInCart.size() ; i++) {
+                System.out.println(i + "." + booksInCart.get(i));
             }
         }
     }
@@ -235,7 +355,7 @@ public class User {
 
     public void searchByAuthor() {
         //ResultSet for books
-        ResultSet result = null;
+        ResultSet result;
         Scanner input = new Scanner(System.in);
         System.out.println("What is the name of the author?");
         String author = input.nextLine();
@@ -251,7 +371,7 @@ public class User {
 
     public void searchByGenre() {
         //ResultSet for books
-        ResultSet result = null;
+        ResultSet result;
         Scanner input = new Scanner(System.in);
         System.out.println("What is the genre of the book");
         String genre = input.nextLine();
@@ -267,7 +387,7 @@ public class User {
 
     public void searchByPublisher() {
         //ResultSet for books
-        ResultSet result = null;
+        ResultSet result;
         Scanner input = new Scanner(System.in);
         System.out.println("What is the name of the publisher?");
         String publisher = input.nextLine();
@@ -331,7 +451,6 @@ public class User {
             String publisherName = result.getString("publisherName");
             int quantityStock = result.getInt("inStock");
 
-
             System.out.println(counter + "." +
                     " ISBN: " + ISBN +
                     ", Book Name: " + bookName +
@@ -367,7 +486,6 @@ public class User {
             if (!result.next()) {
                 flag = false;
                 cartOption();
-
             }
 
 
