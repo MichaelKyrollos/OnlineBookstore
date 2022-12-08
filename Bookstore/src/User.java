@@ -74,7 +74,7 @@ public class User {
                         userSearch();
                         break;
                     case 2:
-                        showUserCart();
+                        showCartMenu();
                         break;
                 }
             }
@@ -86,13 +86,12 @@ public class User {
         } while (!input.hasNextInt());
     }
 
-    public void showUserCart() {
+    public void showCartMenu() {
         Scanner input = new Scanner(System.in);
         System.out.println("\n------------------\n" +
                 "  USER CART \n" +
                 "------------------\n" );
         System.out.println("Showing cart...\n");
-        showCartItems();
         System.out.println(
                 "0/ Go Back\n" +
                 "1/ Place Order\n" +
@@ -121,7 +120,7 @@ public class User {
             }
             catch(InputMismatchException e) {
                 System.out.println("Please enter a valid input");
-                showUserCart();
+                showCartMenu();
             }
 
         } while (!input.hasNextInt());
@@ -149,7 +148,7 @@ public class User {
         if (bookNum < booksInCart.size()) {
             booksInCart.remove(bookNum);
             System.out.println("This is not a valid option");
-            showUserCart();
+            showCartMenu();
         }
         else {
             System.out.println("This is not a valid option");
@@ -182,7 +181,7 @@ public class User {
             Book selectedBook = booksInCart.get(bookNum);
             if(0 <= removeThisMany && removeThisMany <= selectedBook.getQuantitiy()) {
                 selectedBook.setQuantityToBuy(selectedBook.getQuantitiy() - removeThisMany);
-                showUserCart();
+                showCartMenu();
             }
             else {
                 System.out.println("You cannot remove this much!");
@@ -220,8 +219,8 @@ public class User {
             System.out.println("There is nothing in the cart");
         }
         else {
-            for (Book b : booksInCart) {
-                System.out.println("-" + b);
+            for (int i = 0 ; i < booksInCart.size() ; i++) {
+                System.out.println(i + "." + booksInCart.get(i));
             }
         }
     }
