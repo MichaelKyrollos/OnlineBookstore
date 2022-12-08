@@ -141,7 +141,7 @@ public class User {
                         userSearch();
                         break;
                     case 2:
-                        showUserCart();
+                        showCartMenu();
                         break;
                 }
             }
@@ -153,13 +153,11 @@ public class User {
         } while (!input.hasNextInt());
     }
 
-    public void showUserCart() {
+    public void showCartMenu() {
         Scanner input = new Scanner(System.in);
         System.out.println("\n------------------\n" +
                 "  USER CART \n" +
                 "------------------\n" );
-        System.out.println("Showing cart...\n");
-        showCartItems();
         System.out.println(
                 "0/ Go Back\n" +
                 "1/ Place Order\n" +
@@ -188,7 +186,7 @@ public class User {
             }
             catch(InputMismatchException e) {
                 System.out.println("Please enter a valid input");
-                showUserCart();
+                showCartMenu();
             }
 
         } while (!input.hasNextInt());
@@ -198,8 +196,10 @@ public class User {
         Scanner input = new Scanner(System.in);
         do {
             try {
+                System.out.println("Showing book(s) in cart:");
+                showCartItems();
                 System.out.println("Which book would you like to remove from cart? (enter the book number)");
-                removeFromCart(input.nextInt());
+                removeFromCart();
             }
             catch(InputMismatchException e) {
                 System.out.println("Please enter a valid input");
@@ -208,15 +208,28 @@ public class User {
         }while(!input.hasNextInt());
     }
 
-    private void removeFromCart(int nextInt) {
+    private void removeFromCart() throws InputMismatchException{
+        Scanner input = new Scanner(System.in);
+        int bookNum = input.nextInt();
+        if (bookNum < booksInCart.size()) {
+            booksInCart.remove(bookNum);
+            System.out.println("This is not a valid option");
+            showCartMenu();
+        }
+        else {
+            System.out.println("This is not a valid option");
+            addToCart();
+        }
     }
 
     private void decreaseQuantityPrompt() {
         Scanner input = new Scanner(System.in);
         do {
             try {
+                System.out.println("Showing book(s) in cart:");
+                showCartItems();
                 System.out.println("Which book in the cart would you like to decrease the quantity of? (enter the book number)");
-                decreaseQuantity(input.nextInt());
+                decreaseQuantity();
             }
             catch(Exception e) {
                 System.out.println("Please enter a valid input");
@@ -225,15 +238,36 @@ public class User {
         }while(!input.hasNextInt());
     }
 
-    private void decreaseQuantity(int nextInt) {
+    private void decreaseQuantity() {
+        Scanner input = new Scanner(System.in);
+        int bookNum = input.nextInt();
+        System.out.println("By how much would you like to decrease the quantity of the selected book?");
+        int removeThisMany = input.nextInt();
+        if (bookNum < booksInCart.size()) {
+            Book selectedBook = booksInCart.get(bookNum);
+            if(0 <= removeThisMany && removeThisMany <= selectedBook.getQuantitiy()) {
+                selectedBook.setQuantityToBuy(selectedBook.getQuantitiy() - removeThisMany);
+                showCartMenu();
+            }
+            else {
+                System.out.println("You cannot remove this much!");
+                showCartMenu();
+            }
+        }
+        else {
+            System.out.println("This is not a valid option");
+            showCartMenu();
+        }
     }
 
     private void increaseQuantityPrompt() {
         Scanner input = new Scanner(System.in);
         do {
             try {
+                System.out.println("Showing book(s) in cart:");
+                showCartItems();
                 System.out.println("Which book in the cart would you like to increase the quantity of? (enter the book number)");
-                increaseQuantity(input.nextInt());
+                increaseQuantity();
             }
             catch(Exception e) {
                 System.out.println("Please enter a valid input");
@@ -242,7 +276,26 @@ public class User {
         }while(!input.hasNextInt());
     }
 
-    private void increaseQuantity(int nextInt) {
+    private void increaseQuantity() {
+        Scanner input = new Scanner(System.in);
+        int bookNum = input.nextInt();
+        System.out.println("By how much would you like to increase the quantity of the selected book?");
+        int addThisMany = input.nextInt();
+        if (bookNum < booksInCart.size()) {
+            Book selectedBook = booksInCart.get(bookNum);
+            if(0 <= addThisMany && addThisMany + selectedBook.getQuantitiy()  <= selectedBook.getStock()) {
+                selectedBook.setQuantityToBuy(selectedBook.getQuantitiy() + addThisMany);
+                showCartMenu();
+            }
+            else {
+                System.out.println("You cannot add this much!");
+                showCartMenu();
+            }
+        }
+        else {
+            System.out.println("This is not a valid option");
+            addToCart();
+        }
     }
 
     private void placeOrder() {
@@ -253,8 +306,8 @@ public class User {
             System.out.println("There is nothing in the cart");
         }
         else {
-            for (Book b : booksInCart) {
-                System.out.println("-" + b);
+            for (int i = 0 ; i < booksInCart.size() ; i++) {
+                System.out.println(i + "." + booksInCart.get(i));
             }
         }
     }

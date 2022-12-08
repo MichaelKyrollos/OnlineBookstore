@@ -25,6 +25,8 @@ public class Book {
     public void setQuantityToBuy(int quantityToBuy) {
         this.quantityToBuy = quantityToBuy;
     }
+    public int getQuantitiy(){ return quantityToBuy ;}
+    public int getStock(){ return inStock ;}
 
     public int getInStock() {
         return inStock;
