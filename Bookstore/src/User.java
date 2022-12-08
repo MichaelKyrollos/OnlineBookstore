@@ -128,7 +128,7 @@ public class User {
         System.out.println("\n------------------\n" +
                 "  USER MENU \n" +
                 "------------------" );
-        System.out.println("Hello  " + getUsername());
+        System.out.println("Hello " + getUsername());
         System.out.println("1/ Search\n" + "2/ Go to Cart\n" + "3/ Logout\n" );
         do {
             try {
