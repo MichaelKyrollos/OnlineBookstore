@@ -13,8 +13,6 @@ public class User {
     ArrayList<Book> booksInCart;
 
 
-
-
     public User(Bookstore bookstore) {
         this.bookstore = bookstore;
         this.connection = null;
@@ -184,10 +182,14 @@ public class User {
     }
 
     private void showCartItems() {
-        for (Book b : booksInCart) {
-            System.out.println("-" + b);
+        if (booksInCart.isEmpty()) {
+            System.out.println("There is nothing in the cart");
         }
-
+        else {
+            for (Book b : booksInCart) {
+                System.out.println("-" + b);
+            }
+        }
     }
 
     public void userSearch() {
@@ -327,14 +329,16 @@ public class User {
             String bookName = result.getString("bookName");
             String price = result.getString("Price");
             String publisherName = result.getString("publisherName");
+            int quantityStock = result.getInt("inStock");
 
 
             System.out.println(counter + "." +
-                    " ISBN: " + result.getString("isbn") +
-                    ", Book Name: " + result.getString("bookName") +
-                    ", Price: " + result.getString("Price") +
-                    ", Publisher: " + result.getString("publisherName") +
-                    ", Pages: " + result.getString("pages"));
+                    " ISBN: " + ISBN +
+                    ", Book Name: " + bookName +
+                    ", Price: " + price +
+                    ", Publisher: " + publisherName +
+                    ", Pages: " + result.getString("pages") +
+                     ", Quantity in stock: " + quantityStock);
 
             counter++;
             //This second statement is to get the author(s) of this book
@@ -358,7 +362,7 @@ public class User {
                 tempGenre.add(result2.getString("genre"));
             }
 
-            booksSearched.add(new Book(ISBN,bookName,price,publisherName,0, (ArrayList<String>) tempGenre.clone(),(ArrayList<String>) tempAuthor.clone() ));
+            booksSearched.add(new Book(ISBN,bookName,price,publisherName,0,quantityStock, (ArrayList<String>) tempGenre.clone(),(ArrayList<String>) tempAuthor.clone() ));
 
             if (!result.next()) {
                 flag = false;
@@ -373,7 +377,6 @@ public class User {
     private void cartOption() {
         Scanner input = new Scanner(System.in);
         System.out.println("Would you like to add any of the books to the cart? 0/1");
-
         do {
             try {
                 switch ((input.nextInt())) {
@@ -384,11 +387,10 @@ public class User {
                         addToCart();
                         break;
                 }
-            }catch(InputMismatchException e){
+            } catch(InputMismatchException e){
                 System.out.println("Please enter a valid input");
                 cartOption();
             }
-
         } while(!input.hasNextInt());
 
     }
@@ -401,16 +403,22 @@ public class User {
             booksInCart.add(booksSearched.get(bookNum));
             Scanner toBuy = new Scanner(System.in);
             System.out.println("How many would you like?");
-            booksSearched.get(bookNum).setQuantityToBuy(toBuy.nextInt());
-            System.out.println("Added to cart! \n");
-            cartOption();
+            int amountToBuy = toBuy.nextInt();
+            if( amountToBuy> booksSearched.get(bookNum).getInStock()) {
+                System.out.println("We do not have enough in stock!");
+                System.out.println("Decrease your quantity or order another book...");
+                addToCart();
+            }
+            else {
+                booksSearched.get(bookNum).setQuantityToBuy(amountToBuy);
+                System.out.println("Added to cart! \n");
+                cartOption();
+            }
         }
         else {
             System.out.println("This is not a valid option");
             addToCart();
         }
-
-
 
     }
 }
