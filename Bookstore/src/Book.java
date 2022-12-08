@@ -34,6 +34,7 @@ public class Book {
     public void setQuantityToBuy(int quantityToBuy) {
         this.quantityToBuy = quantityToBuy;
     }
+    public int getQuantitiy(){ return quantityToBuy ;}
 
     @Override
     public String toString() {

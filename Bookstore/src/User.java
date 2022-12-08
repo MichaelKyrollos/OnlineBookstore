@@ -133,8 +133,10 @@ public class User {
         Scanner input = new Scanner(System.in);
         do {
             try {
+                System.out.println("Showing book(s) in cart:");
+                showCartItems();
                 System.out.println("Which book would you like to remove from cart? (enter the book number)");
-                removeFromCart(input.nextInt());
+                removeFromCart();
             }
             catch(InputMismatchException e) {
                 System.out.println("Please enter a valid input");
@@ -143,15 +145,28 @@ public class User {
         }while(!input.hasNextInt());
     }
 
-    private void removeFromCart(int nextInt) {
+    private void removeFromCart() throws InputMismatchException{
+        Scanner input = new Scanner(System.in);
+        int bookNum = input.nextInt();
+        if (bookNum < booksInCart.size()) {
+            booksInCart.remove(bookNum);
+            System.out.println("This is not a valid option");
+            showUserCart();
+        }
+        else {
+            System.out.println("This is not a valid option");
+            addToCart();
+        }
     }
 
     private void decreaseQuantityPrompt() {
         Scanner input = new Scanner(System.in);
         do {
             try {
+                System.out.println("Showing book(s) in cart:");
+                showCartItems();
                 System.out.println("Which book in the cart would you like to decrease the quantity of? (enter the book number)");
-                decreaseQuantity(input.nextInt());
+                decreaseQuantity();
             }
             catch(Exception e) {
                 System.out.println("Please enter a valid input");
@@ -160,7 +175,26 @@ public class User {
         }while(!input.hasNextInt());
     }
 
-    private void decreaseQuantity(int nextInt) {
+    private void decreaseQuantity() {
+        Scanner input = new Scanner(System.in);
+        int bookNum = input.nextInt();
+        System.out.println("By how much would you like to decrease the quantity of the selected book?");
+        int removeThisMany = input.nextInt();
+        if (bookNum < booksInCart.size()) {
+            Book selectedBook = booksInCart.get(bookNum);
+            if(0 <= removeThisMany && removeThisMany <= selectedBook.getQuantitiy()) {
+                selectedBook.setQuantityToBuy(selectedBook.getQuantitiy() - removeThisMany);
+                showUserCart();
+            }
+            else {
+                System.out.println("You cannot remove this much!");
+                addToCart();
+            }
+        }
+        else {
+            System.out.println("This is not a valid option");
+            addToCart();
+        }
     }
 
     private void increaseQuantityPrompt() {
@@ -409,8 +443,6 @@ public class User {
             System.out.println("This is not a valid option");
             addToCart();
         }
-
-
 
     }
 }
