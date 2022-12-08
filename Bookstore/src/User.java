@@ -55,7 +55,7 @@ public class User {
             address = input.nextLine();
         } while (username.isEmpty() || password.isEmpty() || address.isEmpty());
 
-        if (addAddress(username,password,address)) {
+        if (registerAccount(username,password,address)) {
             System.out.println("User successfully added");
             this.setUsername(username);
             userMenu();
@@ -67,13 +67,12 @@ public class User {
 
     }
 
-    private boolean addAddress(String username, String password, String address)  {
+    private boolean registerAccount(String username, String password, String address)  {
         try {
             ResultSet result = null;
             Class.forName("org.postgresql.Driver");
             connection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/OnlineBookstore", "postgres", "admin");
             statement = connection.createStatement();
-
             if (connection != null) {
                 try {
                     statement.executeUpdate(
@@ -95,6 +94,7 @@ public class User {
                 Class.forName("org.postgresql.Driver");
                 connection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/OnlineBookstore", "postgres", "admin");
                 statement = connection.createStatement();
+                statement2 = connection.createStatement();
                 result = statement.executeQuery(
                         "select *, username AS usernames from \"user\"  where (username='" + userName + "')");
                 if (connection != null) {
