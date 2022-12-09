@@ -4,8 +4,8 @@ VALUES	('Antwan', 'anty', '1234 Colonel By Dr'),
 		('Victoria', 'vicky', '1111 Colonel By Dr');
 
 INSERT INTO Publisher
-VALUES	('valve@gmail.com', 'Valve', '5555 Publisher Rd', '4520111122223333'),
-		('mihoyo@hotmail.com', 'Mihoyo', '6666 Publisher Rd', '4520444455556666');
+VALUES	('valve@gmail.com', 'Valve', '5555 Publisher Rd', '4520111122223333', 0),
+		('mihoyo@hotmail.com', 'Mihoyo', '6666 Publisher Rd', '4520444455556666', 0);
 
 INSERT INTO Author
 VALUES	('author1@gmail.com', 'One'),
