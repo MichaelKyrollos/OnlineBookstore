@@ -10,7 +10,11 @@ public class Book {
     private ArrayList<String> genre;
     private ArrayList<String> author;
 
-    public Book(String ISBN, String name, String price, String publisher, int quantityToBuy, int inStock, ArrayList<String> genre, ArrayList<String> author) {
+
+
+    private int threshold;
+
+    public Book(String ISBN, String name, String price, String publisher, int quantityToBuy, int inStock, ArrayList<String> genre, ArrayList<String> author,int threshold) {
         this.ISBN = ISBN;
         this.name = name;
         this.price = price;
@@ -19,6 +23,7 @@ public class Book {
         this.inStock = inStock;
         this.genre = genre;
         this.author = author;
+        this.threshold = threshold;
     }
 
     public void setQuantityToBuy(int quantityToBuy) {
@@ -29,7 +34,27 @@ public class Book {
     public int getInStock() {
         return inStock;
     }
+    public int getThreshold() {
+        return threshold;
+    }
 
+    public int computeUpdatedStock() {
+        int updatedStock = 0;
+       // decrease the stock
+        if (thresholdRestock()) {
+            updatedStock = getThreshold() * 2;
+        } else {
+            updatedStock = getInStock() - getQuantity();
+        }
+        return updatedStock;
+    }
+
+    public boolean thresholdRestock() {
+        if (getInStock()-quantityToBuy < threshold) {
+            return true;
+        }
+        return false;
+    }
     @Override
     public String toString() {
         String printGenre="";
