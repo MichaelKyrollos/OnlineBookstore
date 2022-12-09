@@ -332,7 +332,7 @@ public class Manager {
 
         try {
             statement.executeUpdate("INSERT INTO publisher VALUES ('" + email + "', '" + name +
-                    "', '" + address + "', '" + bankingInfo + "');");
+                    "', '" + address + "', '" + bankingInfo + "', 0);");
             //System.out.println("Successfully added to Database!");
         } catch (SQLException sqle) {
             System.out.println("Error: Could not Add to Database!");
