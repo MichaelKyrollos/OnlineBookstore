@@ -20,7 +20,8 @@ CREATE TABLE Publisher (
     email		VARCHAR(40)	PRIMARY KEY,
     name		VARCHAR(20)	NOT NULL,
     address		VARCHAR(50)	NOT NULL,
-    bankingInfo	CHAR(16) NOT NULL
+    bankingInfo	CHAR(16) NOT NULL,
+	earnings	FLOAT	NOT NULL
 );
 
 CREATE TABLE Author (
