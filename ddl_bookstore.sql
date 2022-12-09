@@ -40,7 +40,7 @@ CREATE TABLE "order" (
 
 CREATE TABLE "contains" (
 	orderNum		INT,
-	isbn			INT,
+	isbn			CHAR(13),
 	quantity		INT	NOT NULL,
 	PRIMARY KEY (orderNum, isbn),
 	FOREIGN KEY (orderNum) 
@@ -56,8 +56,6 @@ CREATE TABLE BOOK (
     percentToPublisher	INT NOT NULL, 
     price				FLOAT	NOT NULL, 
     pages				INT	NOT NULL, 
-    soldThisMonth		INT	NOT NULL,
-    soldLastMonth		INT	NOT NULL,
     amountSoldHistory	INT NOT NULL,    
     PRIMARY KEY(isbn),
     FOREIGN KEY (publisher)
