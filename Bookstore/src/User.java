@@ -182,6 +182,7 @@ public class User {
                     case 4:
                         removeBookFromCartPrompt();
                         break;
+
                 }
             }
             catch(InputMismatchException e) {
@@ -245,8 +246,8 @@ public class User {
         int removeThisMany = input.nextInt();
         if (bookNum < booksInCart.size()) {
             Book selectedBook = booksInCart.get(bookNum);
-            if(0 <= removeThisMany && removeThisMany <= selectedBook.getQuantitiy()) {
-                selectedBook.setQuantityToBuy(selectedBook.getQuantitiy() - removeThisMany);
+            if(0 <= removeThisMany && removeThisMany <= selectedBook.getQuantity()) {
+                selectedBook.setQuantityToBuy(selectedBook.getQuantity() - removeThisMany);
                 showCartMenu();
             }
             else {
@@ -283,8 +284,8 @@ public class User {
         int addThisMany = input.nextInt();
         if (bookNum < booksInCart.size()) {
             Book selectedBook = booksInCart.get(bookNum);
-            if(0 <= addThisMany && addThisMany + selectedBook.getQuantitiy()  <= selectedBook.getStock()) {
-                selectedBook.setQuantityToBuy(selectedBook.getQuantitiy() + addThisMany);
+            if(0 <= addThisMany && addThisMany + selectedBook.getQuantity()  <= selectedBook.getInStock()) {
+                selectedBook.setQuantityToBuy(selectedBook.getQuantity() + addThisMany);
                 showCartMenu();
             }
             else {
@@ -299,6 +300,113 @@ public class User {
     }
 
     private void placeOrder() {
+        ResultSet result;
+        int orderNum = 0;
+        String billingAddress="";
+        String shippingAddress ="";
+        if (!booksInCart.isEmpty()) {
+            Scanner input = new Scanner(System.in);
+            // Shipping address
+            System.out.println("Would you like the shipping address to be the same as your home address? 0 for NO, 1 for YES");
+                    switch ((input.nextInt())) {
+                        case 0:
+                            Scanner address = new Scanner(System.in);
+                            System.out.println("What address would you like the order to ship to?");
+                            shippingAddress = address.nextLine();
+                            System.out.println("Done");
+
+                            break;
+                        case 1:
+                            try {
+                                //The first statement is to get the books
+                                result = statement.executeQuery(
+                                        "select homeaddress from \"user\" where (username='" + getUsername() + "');");
+                                result.next();
+                                shippingAddress = result.getString("homeaddress");
+                                System.out.println("Shipping address is " + shippingAddress);
+                            } catch (SQLException sqle) {
+                                System.out.println("NOT WORKING!" + sqle);
+                            }
+                            break;
+                    }
+                    // Billing address
+                    System.out.println("Would you like the billing address to be the same as your home address? 0 for NO, 1 for YES");
+                    switch ((input.nextInt())) {
+                        case 0:
+                            Scanner address = new Scanner(System.in);
+                            System.out.println("What billing address would you like?");
+                            billingAddress = address.nextLine();
+                            break;
+                        case 1:
+                            try {
+                                //The first statement is to get the books
+                                result = statement.executeQuery(
+                                        "select homeaddress from \"user\" where (username='" + getUsername() + "');");
+                                result.next();
+                                billingAddress = result.getString("homeaddress");
+                                System.out.println("Billing address set as " + billingAddress);
+                            } catch (SQLException sqle) {
+                                System.out.println("NOT WORKING!" + sqle);
+                            }
+                            break;
+                    }
+            if (processOrder(billingAddress, shippingAddress)) {
+                booksInCart.clear();
+                System.out.println("Order Successful!");
+            } else {
+                System.out.println("That didn't work");
+            }
+        }
+        userMenu();
+    }
+
+    private boolean processOrder(String billingAddress, String shippingAddress) {
+        ResultSet result;
+        // query used to generate next order number by incrementing the highest number in the table
+        int orderNum;
+        try {
+            //The first statement is to get the books
+            result = statement.executeQuery(
+                    "select max(ordernum) from \"order\"");
+            result.next();
+            orderNum = result.getInt("max");
+        } catch (SQLException sqle) {
+            System.out.println("NOT WORKING!" + sqle);
+            return false;
+        }
+        orderNum++;
+        //Creating the order
+        try {
+            statement.executeUpdate("INSERT INTO \"order\" VALUES ('" + orderNum + "', '" + shippingAddress + "','" + getUsername() + "', '" + billingAddress + "');");
+        } catch (SQLException sqle) {
+            System.out.println("0 Error: Could not Add to Database!");
+            System.out.println(sqle);
+            return false;
+        }
+        // for every cart item, add it to the contains relation
+        for (Book b :booksInCart) {
+            try {
+                statement.executeUpdate("INSERT INTO contains VALUES ('" + orderNum + "', '" + b.getISBN() + "','" + b.getQuantity() + "');");
+
+            } catch (SQLException sqle) {
+                System.out.println("1 Error: Could not Add to Database!");
+                System.out.println(sqle);
+                return false;
+            }
+            try {
+                // decrease the stock
+                int decreaseStock = b.getQuantity();
+                int buying = b.getQuantity();
+                String ISBN = b.getISBN();
+                statement.executeUpdate("UPDATE book SET instock = instock - '" + decreaseStock  + "', amountsoldhistory = amountsoldhistory + '" + buying  + "' where book.isbn = '" + ISBN  + "'");
+            } catch (SQLException sqle) {
+                System.out.println("2 Error: Could not Add to Database!");
+                System.out.println(sqle);
+                return false;
+            }
+        }
+        return true;
+
     }
 
     private void showCartItems() {
@@ -518,9 +626,13 @@ public class User {
         System.out.println("Enter the book number you would like");
         int bookNum = input.nextInt();
         if (bookNum < booksSearched.size()) {
-            booksInCart.add(booksSearched.get(bookNum));
+            boolean isInCart = booksInCart.contains(booksSearched.get(bookNum));
+            if (!isInCart) {
+                booksInCart.add(booksSearched.get(bookNum));
+            }
             Scanner toBuy = new Scanner(System.in);
             System.out.println("How many would you like?");
+
             int amountToBuy = toBuy.nextInt();
             if( amountToBuy> booksSearched.get(bookNum).getInStock()) {
                 System.out.println("We do not have enough in stock!");
@@ -528,7 +640,10 @@ public class User {
                 addToCart();
             }
             else {
-                booksSearched.get(bookNum).setQuantityToBuy(amountToBuy);
+                if (isInCart) {
+                    booksInCart.indexOf(booksSearched.get(bookNum));
+                }
+                booksInCart.get(booksInCart.size()-1).setQuantityToBuy(amountToBuy);
                 System.out.println("Added to cart! \n");
                 cartOption();
             }
