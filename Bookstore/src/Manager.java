@@ -194,32 +194,38 @@ public class Manager {
         String pages = "";
         String genreNum = "";
         String genre = "";
+        String percent = "";
+        String threshold = "";
 
         System.out.println("\n------------------\n" +
                 "ADD BOOK \n" +
                 "------------------" );
 
         while (isbn.isEmpty() || name.isEmpty() || publisher.isEmpty() || quantity.isEmpty() || price.isEmpty() || pages.isEmpty()
-                || !isInteger(quantity) || !isFloat(price) || !isInteger(pages)) {
+                || !isInteger(quantity) || !isFloat(price) || !isInteger(pages) || !isInteger(percent) || !isInteger(threshold)) {
             System.out.print("ISBN: ");
             isbn = input.nextLine();
             System.out.print("Name: ");
             name = input.nextLine();
             System.out.print("Publisher: ");
             publisher = input.nextLine();
-            System.out.print("Quantity: ");
+            System.out.print("Stock: ");
             quantity = input.nextLine();
             System.out.print("Price: ");
             price = input.nextLine();
             System.out.print("Pages: ");
             pages = input.nextLine();
+            System.out.print("Percentage to publisher: ");
+            percent = input.nextLine();
+            System.out.print("Threshold Quantity: ");
+            threshold = input.nextLine();
             if (isbn.isEmpty() || name.isEmpty() || publisher.isEmpty() || quantity.isEmpty() || price.isEmpty() || pages.isEmpty()
-                    || !isInteger(quantity) || !isFloat(price) || !isInteger(pages))
+                    || !isInteger(quantity) || !isFloat(price) || !isInteger(pages) || !isInteger(percent) || !isInteger(threshold))
                 System.out.println("Please enter a valid input.\n");
         }
 
 
-        if(!addBookToDB(isbn, name, publisher, quantity, price, pages)) {
+        if(!addBookToDB(isbn, name, publisher, quantity, price, pages, percent, threshold)) {
             managerLogin();
         }
 
@@ -351,12 +357,12 @@ public class Manager {
         return true;
     }
 
-    public boolean addBookToDB(String isbn, String name, String publisher, String quantity, String price, String pages) {
+    public boolean addBookToDB(String isbn, String name, String publisher, String quantity, String price, String pages, String percent, String threshold) {
         System.out.println("Adding to database...");
 
         try {
-            statement.executeUpdate("INSERT INTO book VALUES ('" + isbn + "', '" + name + "', '" + publisher + "', '" + quantity + "', " + 0 + ", " +
-                    0 + ", " + Float.parseFloat(price) + ", " + Integer.parseInt(pages) + ", " + 0 + ", " + 0 + ", " + 0 + ");");
+            statement.executeUpdate("INSERT INTO book VALUES ('" + isbn + "', '" + name + "', '" + publisher + "', '" + quantity + "', " + Float.parseFloat(threshold) + ", " +
+                    Float.parseFloat(percent) + ", " + Float.parseFloat(price) + ", " + Integer.parseInt(pages) + ", " + 0 + ");");
             //System.out.println("Successfully added to Database!");
         } catch (SQLException sqle) {
             System.out.println("Error: Could not Add to Database!");
