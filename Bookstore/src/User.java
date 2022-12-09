@@ -626,13 +626,22 @@ public class User {
         System.out.println("Enter the book number you would like");
         int bookNum = input.nextInt();
         int increaseBy =0;
+        int index = 0;
         if (bookNum < booksSearched.size()) {
-            boolean isInCart = booksInCart.contains(booksSearched.get(bookNum));
+            //boolean isInCart = booksInCart.contains(booksSearched.get(bookNum));
+            boolean isInCart = false;
+            for (Book b :booksInCart) {
+                if(b.getISBN().equals(booksSearched.get(bookNum).getISBN())){
+                    isInCart = true;
+                    break;
+                }
+                index++;
+            }
             if (isInCart) {
                 Scanner increaseQuantity = new Scanner(System.in);
                 System.out.println("This book is already in the cart. By how much would you like to increase the amount?");
                 increaseBy = increaseQuantity.nextInt();
-                int index = booksInCart.indexOf(booksSearched.get(bookNum));
+                //int index = booksInCart.indexOf(booksSearched.get(bookNum));
                 if (increaseBy + booksInCart.get(index).getQuantity()> booksSearched.get(bookNum).getInStock()) {
                     System.out.println("We do not have enough in stock!");
                     System.out.println("Decrease your quantity or order another book...");
