@@ -394,11 +394,9 @@ public class User {
                 return false;
             }
             try {
-                // decrease the stock
-                int decreaseStock = b.getQuantity();
                 int buying = b.getQuantity();
                 String ISBN = b.getISBN();
-                statement.executeUpdate("UPDATE book SET instock = instock - '" + decreaseStock  + "', amountsoldhistory = amountsoldhistory + '" + buying  + "' where book.isbn = '" + ISBN  + "'");
+                statement.executeUpdate("UPDATE book SET instock = '" + b.computeUpdatedStock()  + "', amountsoldhistory = amountsoldhistory + '" + buying  + "' where book.isbn = '" + ISBN  + "'");
             } catch (SQLException sqle) {
                 System.out.println("2 Error: Could not Add to Database!");
                 System.out.println(sqle);
@@ -558,6 +556,8 @@ public class User {
             String price = result.getString("Price");
             String publisherName = result.getString("publisherName");
             int quantityStock = result.getInt("inStock");
+            int threshold = result.getInt("thresholdquantity");
+
 
             System.out.println(counter + "." +
                     " ISBN: " + ISBN +
@@ -589,7 +589,7 @@ public class User {
                 tempGenre.add(result2.getString("genre"));
             }
 
-            booksSearched.add(new Book(ISBN,bookName,price,publisherName,0,quantityStock, (ArrayList<String>) tempGenre.clone(),(ArrayList<String>) tempAuthor.clone() ));
+            booksSearched.add(new Book(ISBN,bookName,price,publisherName,0,quantityStock, (ArrayList<String>) tempGenre.clone(),(ArrayList<String>) tempAuthor.clone(),threshold));
 
             if (!result.next()) {
                 flag = false;
