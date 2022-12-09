@@ -569,8 +569,8 @@ public class User {
 
             counter++;
             //This second statement is to get the author(s) of this book
-            ArrayList<String> tempAuthor = new ArrayList<>();
-            ArrayList<String> tempGenre = new ArrayList<>();
+            ArrayList<String> tempAuthor = new ArrayList<String>();
+            ArrayList<String> tempGenre = new ArrayList<String>();
             result2 = statement2.executeQuery("select *, author.name AS authorName\n" +
                     "from writtenby, book, author\n" +
                     "where book.isbn = writtenby.isbn AND writtenby.authemail = author.email AND writtenby.isbn = '"+ result.getString("isbn")  +"'");
@@ -625,28 +625,37 @@ public class User {
         Scanner input = new Scanner(System.in);
         System.out.println("Enter the book number you would like");
         int bookNum = input.nextInt();
+        int increaseBy =0;
         if (bookNum < booksSearched.size()) {
             boolean isInCart = booksInCart.contains(booksSearched.get(bookNum));
-            if (!isInCart) {
-                booksInCart.add(booksSearched.get(bookNum));
-            }
-            Scanner toBuy = new Scanner(System.in);
-            System.out.println("How many would you like?");
-
-            int amountToBuy = toBuy.nextInt();
-            if( amountToBuy> booksSearched.get(bookNum).getInStock()) {
-                System.out.println("We do not have enough in stock!");
-                System.out.println("Decrease your quantity or order another book...");
-                addToCart();
+            if (isInCart) {
+                Scanner increaseQuantity = new Scanner(System.in);
+                System.out.println("This book is already in the cart. By how much would you like to increase the amount?");
+                increaseBy = increaseQuantity.nextInt();
+                int index = booksInCart.indexOf(booksSearched.get(bookNum));
+                if (increaseBy + booksInCart.get(index).getQuantity()> booksSearched.get(bookNum).getInStock()) {
+                    System.out.println("We do not have enough in stock!");
+                    System.out.println("Decrease your quantity or order another book...");
+                    addToCart();
+                }
+                else {
+                    booksInCart.get(index).setQuantityToBuy(increaseBy+booksInCart.get(index).getQuantity());
+                }
             }
             else {
-                if (isInCart) {
-                    booksInCart.indexOf(booksSearched.get(bookNum));
+                Scanner toBuy = new Scanner(System.in);
+                System.out.println("How many would you like?");
+                int amountToBuy = toBuy.nextInt();
+                if( amountToBuy > booksSearched.get(bookNum).getInStock()) {
+                    System.out.println("We do not have enough in stock!");
+                    System.out.println("Decrease your quantity or order another book...");
+                    addToCart();
                 }
+                booksInCart.add(booksSearched.get(bookNum));
                 booksInCart.get(booksInCart.size()-1).setQuantityToBuy(amountToBuy);
-                System.out.println("Added to cart! \n");
-                cartOption();
             }
+            System.out.println("Added to cart! \n");
+            cartOption();
         }
         else {
             System.out.println("This is not a valid option");
