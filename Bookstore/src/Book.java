@@ -1,4 +1,3 @@
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 public class Book {
@@ -25,9 +24,8 @@ public class Book {
     public void setQuantityToBuy(int quantityToBuy) {
         this.quantityToBuy = quantityToBuy;
     }
-    public int getQuantitiy(){ return quantityToBuy ;}
-    public int getStock(){ return inStock ;}
-
+    public int getQuantity(){ return quantityToBuy ;}
+    public String getISBN() {return ISBN;}
     public int getInStock() {
         return inStock;
     }

@@ -12,9 +12,9 @@ VALUES	('author1@gmail.com', 'One'),
 		('author2@gmail.com', 'Two');
 
 INSERT INTO Book
-VALUES	('1234567890123', 'Antwan the Great', 'valve@gmail.com', 5, 3, 3, 10.99, 420, 0, 0, 0),
-		('1231234567890', 'Vicky the Great', 'mihoyo@hotmail.com', 3, 3, 3, 15.69, 255, 0, 0, 0),
-		('1234512367890', 'Mikey the Great', 'valve@gmail.com', 5, 3, 3, 20.00, 27, 0, 0, 0);
+VALUES	('1234567890123', 'Antwan the Great', 'valve@gmail.com', 10, 6, 3, 10.99, 420, 0),
+		('1231234567890', 'Vicky the Great', 'mihoyo@hotmail.com', 7, 3, 3, 15.69, 255, 0),
+		('1234512367890', 'Mikey the Great', 'valve@gmail.com', 5, 3, 3, 20.00, 27, 0);
 
 INSERT INTO Genres
 VALUES	('1234567890123', 'Thriller'),
