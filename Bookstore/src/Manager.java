@@ -52,7 +52,11 @@ public class Manager {
 
                     case 1:
                         addAuthor();
+<<<<<<< Updated upstream
                         managerLogin();
+=======
+                        showManagerMenu();
+>>>>>>> Stashed changes
                         break;
 
                     case 2:
@@ -81,6 +85,9 @@ public class Manager {
 
                     case 8:
                         reportSalesExpenditures();
+                        break;
+
+                    case 9:
                         bookstore.printWelcome();
 
                 }
@@ -110,7 +117,7 @@ public class Manager {
             System.out.println("Error: Could not Add to Database!");
             System.out.println(sqle);
         }
-        System.out.println("Bookstore revenue: $"+ revenue);
+
         try {
             result = statement.executeQuery("SELECT * from publisher");
             //System.out.println("Successfully added to Database!");
@@ -121,9 +128,18 @@ public class Manager {
             System.out.println("Error: Could not Add to Database!");
             System.out.println(sqle);
         }
+
+        System.out.println("Bookstore revenue: $"+ revenue);
         System.out.println("Bookstore expenditure: $"+ royalty);
         float profit = revenue - royalty;
         System.out.println("The bookstore profit: $" +profit);
+
+        System.out.println("\n---------------\n");
+        Scanner input = new Scanner(System.in);
+        System.out.println("\nEnter anything to go back...");
+        if(input.hasNext()){
+            showManagerMenu();
+        }
     }
 
     /*
@@ -175,7 +191,8 @@ public class Manager {
                 System.out.println("Please enter a valid input.");
             }
         }
-        managerLogin();
+        //managerLogin();
+        showManagerMenu();
     }
 
     /*
@@ -284,7 +301,8 @@ public class Manager {
 
 
         if(!addBookToDB(isbn, name, publisher, quantity, price, pages, percent, threshold)) {
-            managerLogin();
+            //managerLogin();
+            showManagerMenu();
         }
 
         while (!isInteger(genreNum)) {
@@ -304,7 +322,8 @@ public class Manager {
         }
 
         addWrittenBy(isbn, name);
-        managerLogin();
+        //managerLogin();
+        showManagerMenu();
     }
 
     /*
@@ -358,34 +377,6 @@ public class Manager {
             numAuths--;
         }
 
-/*
-        for (int i = 0; i < Integer.parseInt(authors); i++) {
-            try {
-                result = statement.executeQuery(
-                        "SELECT name, email FROM author;"
-                );
-                while(result.next())  {
-                    System.out.println("Author #" + num++);
-                    System.out.println("\tName: " + result.getString("name"));
-                    System.out.println("\tEmail: " + result.getString("email"));
-                }
-                System.out.println();
-            } catch (SQLException sqle) {
-                System.out.println(sqle);
-            }
-
-            System.out.println("Please enter the email of the author(s) of " + name + ":");
-            System.out.println("Note: If the author's name is not on this list, please enter 0 to add the author to the database");
-            email = input.nextLine();
-            if(Objects.equals(email, "0")) {
-                addAuthor();
-            }
-            if(!addWrittenByToDB(email, isbn)){
-                i--;
-                System.out.println("Please enter a valid input.");
-            }
-        }*/
-        return;
     }
 
     /*
@@ -506,7 +497,8 @@ public class Manager {
             System.out.println("Error: Could not remove from Database!");
             System.out.println(sqle);
         }
-        managerLogin();
+        //managerLogin();
+        showManagerMenu();
     }
 
     /*
