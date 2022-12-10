@@ -25,22 +25,55 @@ public class Book {
         this.threshold = threshold;
     }
 
+    /*
+     * Getter method for publisher field
+     */
     public String getPublisher() {return publisher; }
 
+    /*
+     * Getter method for percent to publisher (to pay)
+     */
     public float getPercentToPublisher() { return percentToPublisher;}
+
+    /*
+     * Setter method to set wanted quantity of book to buy
+     */
     public void setQuantityToBuy(int quantityToBuy) {
         this.quantityToBuy = quantityToBuy;
     }
+
+    /*
+     * Getter method for price of a book
+     */
     public float getPrice() { return price;}
+
+    /*
+     * Getter method for getting quantity of book to buy
+     */
     public int getQuantity(){ return quantityToBuy ;}
+
+    /*
+     * Getter method for ISBN of book
+     */
     public String getISBN() {return ISBN;}
+
+    /*
+     * Getter method for quantity in stock of book
+     */
     public int getInStock() {
         return inStock;
     }
+
+    /*
+     * Getter method for threshold amount of a book
+     */
     public int getThreshold() {
         return threshold;
     }
 
+    /*
+     * Logic to determine if stock is below threshold amount
+     */
     public int computeUpdatedStock() {
         int updatedStock = 0;
         // decrease the stock
@@ -52,12 +85,19 @@ public class Book {
         return updatedStock;
     }
 
+    /*
+     * Returns true if the book needs to be restocked
+     */
     public boolean thresholdRestock() {
         if (getInStock()-quantityToBuy < threshold) {
             return true;
         }
         return false;
     }
+
+    /*
+     * Method to print out a representation of a book, used in user interface
+     */
     @Override
     public String toString() {
         String printGenre="";
