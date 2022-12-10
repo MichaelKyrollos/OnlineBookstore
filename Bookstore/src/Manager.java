@@ -52,11 +52,7 @@ public class Manager {
 
                     case 1:
                         addAuthor();
-<<<<<<< Updated upstream
-                        managerLogin();
-=======
                         showManagerMenu();
->>>>>>> Stashed changes
                         break;
 
                     case 2:
