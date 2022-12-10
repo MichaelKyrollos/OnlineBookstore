@@ -18,14 +18,23 @@ public class User {
         booksInCart = new ArrayList<>();
     }
 
+    /*
+     * Setter method for username
+     */
     public void setUsername(String username) {
         this.username = username;
     }
 
+    /*
+     * Getter method for username
+     */
     public String getUsername() {
         return username;
     }
 
+    /*
+     * Initial login page of user
+     */
     public void userLogin() {
 
         Scanner input = new Scanner(System.in);
@@ -42,6 +51,10 @@ public class User {
             loginExistingUser(userName,password);
         } while (input.hasNextInt());
     }
+
+    /*
+     * Menu to create new user that can be added to the database
+     */
     public void newUser() {
         Scanner input = new Scanner(System.in);
         String username;
@@ -68,6 +81,9 @@ public class User {
 
     }
 
+    /*
+     * Makes SQL call and connection the database to register a new account. Returns true if successful, false otherwise
+     */
     private boolean registerAccount(String username, String password, String address)  {
         try {
             ResultSet result = null;
@@ -88,6 +104,11 @@ public class User {
         }
         return true;
     }
+
+    /*
+     * SQL call and connection to the database for login of existing user
+     * It will match the username to the password in the schema to check if the login is valid.
+     */
     public void loginExistingUser(String userName, String password) {
         {
             try {
@@ -129,6 +150,9 @@ public class User {
         }
     }
 
+    /*
+     * Main menu once a user has logged in
+     */
     public void userMenu() {
         Scanner input = new Scanner(System.in);
         System.out.println("\n------------------\n" +
@@ -162,6 +186,9 @@ public class User {
         } while (!input.hasNextInt());
     }
 
+    /*
+     * Returns the orders of the user who is in the session
+     */
     private void showOrders() {
         try {
             ResultSet result = null;
@@ -208,6 +235,10 @@ public class User {
         }
     }
 
+    /*
+     * Shows cart of currently logged-in user
+     * Cart is erased once the session is done.
+     */
     public void showCartMenu() {
         Scanner input = new Scanner(System.in);
         System.out.println("\n------------------\n" +
@@ -252,6 +283,9 @@ public class User {
         } while (!input.hasNextInt());
     }
 
+    /*
+     * Interface for user to remove items from cart
+     */
     private void removeBookFromCartPrompt() {
         Scanner input = new Scanner(System.in);
         do {
@@ -265,9 +299,13 @@ public class User {
                 System.out.println("Please enter a valid input");
                 removeBookFromCartPrompt();
             }
-        }while(!input.hasNextInt());
+        } while(!input.hasNextInt());
     }
 
+    /*
+     * Logic to remove item from cart
+     * Checks the quantity in cart and validates user input
+     */
     private void removeFromCart() throws InputMismatchException{
         Scanner input = new Scanner(System.in);
         int bookNum = input.nextInt();
@@ -281,6 +319,9 @@ public class User {
         }
     }
 
+    /*
+     * User interface to decrease quantity of item in cart
+     */
     private void decreaseQuantityPrompt() {
         Scanner input = new Scanner(System.in);
         do {
@@ -294,9 +335,12 @@ public class User {
                 System.out.println("Please enter a valid input");
                 decreaseQuantityPrompt();
             }
-        }while(!input.hasNextInt());
+        } while(!input.hasNextInt());
     }
 
+    /*
+     * Logic to adjust quantity of an item in cart
+     */
     private void decreaseQuantity() {
         Scanner input = new Scanner(System.in);
         int bookNum = input.nextInt();
@@ -319,6 +363,9 @@ public class User {
         }
     }
 
+    /*
+     * User interface to increase quantity of item in cart
+     */
     private void increaseQuantityPrompt() {
         Scanner input = new Scanner(System.in);
         do {
@@ -335,6 +382,9 @@ public class User {
         }while(!input.hasNextInt());
     }
 
+    /*
+     * Logic to increase quantity of item in cart
+     */
     private void increaseQuantity() {
         Scanner input = new Scanner(System.in);
         int bookNum = input.nextInt();
@@ -357,6 +407,9 @@ public class User {
         }
     }
 
+    /*
+     * Places order using items from cart
+     */
     private void placeOrder() {
         ResultSet result;
         int orderNum = 0;
@@ -418,6 +471,9 @@ public class User {
         userMenu();
     }
 
+    /*
+     * Helper method for placing order, returns true if successful, false otherwise
+     */
     private boolean processOrder(String billingAddress, String shippingAddress) {
         ResultSet result;
         // query used to generate next order number by incrementing the highest number in the table
@@ -453,6 +509,7 @@ public class User {
             }
             float earningPub = (b.getQuantity() * b.getPrice()) * (b.getPercentToPublisher() / 100);
             String bookPublisher = searchByPublisherEmail(b.getPublisher());
+            // update the earnings in publisher
             try {
                 statement.executeUpdate("UPDATE publisher SET earnings = earnings + '" + earningPub + "' where '" + bookPublisher  + "' = publisher.email");
 
@@ -461,6 +518,7 @@ public class User {
                 System.out.println(sqle);
                 return false;
             }
+            // update the stock of the book
             try {
                 int buying = b.getQuantity();
                 String ISBN = b.getISBN();
@@ -475,6 +533,9 @@ public class User {
 
     }
 
+    /*
+     * Returns items in cart to user, for a given session
+     */
     private void showCartItems() {
         if (booksInCart.isEmpty()) {
             System.out.println("There is nothing in the cart");
@@ -486,6 +547,9 @@ public class User {
         }
     }
 
+    /*
+     * User Search menu
+     */
     public void userSearch() {
         Scanner input = new Scanner(System.in);
         System.out.println("\n------------------\n" +
@@ -527,6 +591,9 @@ public class User {
         }while(!input.hasNextInt());
     }
 
+    /*
+     * Interface to search by author, includes SQL
+     */
     public void searchByAuthor() {
         //ResultSet for books
         ResultSet result;
@@ -543,6 +610,9 @@ public class User {
         }
     }
 
+    /*
+     * Interface to search by genre, includes SQL
+     */
     public void searchByGenre() {
         //ResultSet for books
         ResultSet result;
@@ -559,6 +629,9 @@ public class User {
         }
     }
 
+    /*
+     * Interface to search by publisher, includes SQL
+     */
     public void searchByPublisher() {
         //ResultSet for books
         ResultSet result;
@@ -575,6 +648,9 @@ public class User {
         }
     }
 
+    /*
+     * Allows to search by email, helper function that will return the publisher email given the name
+     */
     public String searchByPublisherEmail(String publisherName) {
         //ResultSet for books
         ResultSet result;
@@ -591,6 +667,9 @@ public class User {
         return email;
     }
 
+    /*
+     * Interface to search by ISBN, includes SQL
+     */
     public void searchByISBN() {
         //ResultSet for books
         ResultSet result = null;
@@ -607,6 +686,9 @@ public class User {
         }
     }
 
+    /*
+     * Interface to search by name, includes SQL
+     */
     public void searchByName() {
         //ResultSet for books
         ResultSet result = null;
@@ -623,6 +705,10 @@ public class User {
         }
     }
 
+    /*
+     * Returns data found by searches, used by all searching functions.
+     * Parses through SQL data to create readable format by user
+     */
     private void searchBook(ResultSet result) throws SQLException {
         int counter = 0;
         ResultSet result2 = null;
@@ -684,6 +770,9 @@ public class User {
         }
     }
 
+    /*
+     * Prompt allowing for user to add item to cart, will continue to show until user dismisses
+     */
     private void cartOption() {
         Scanner input = new Scanner(System.in);
         System.out.println("Would you like to add any of the books to the cart? 0 for NO, 1 for YES");
@@ -705,6 +794,9 @@ public class User {
 
     }
 
+    /*
+     * User input to add a book to the cart, given a list of books
+     */
     public void addToCart() {
         Scanner input = new Scanner(System.in);
         System.out.println("Enter the book number you would like");
