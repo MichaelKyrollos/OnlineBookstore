@@ -130,7 +130,7 @@ public class User {
                 "  USER MENU \n" +
                 "------------------" );
         System.out.println("Hello " + getUsername());
-        System.out.println("0/ To Exit\n1/ Search\n" + "2/ Go to Cart\n" + "3/ Logout\n" );
+        System.out.println("0/ Go Back\n1/ Search\n" + "2/ Go to Cart\n" + "3/ Logout\n" );
         do {
             try {
                 switch ((input.nextInt())) {
@@ -393,6 +393,16 @@ public class User {
                 System.out.println(sqle);
                 return false;
             }
+            float earningPub = (b.getQuantity() * b.getPrice()) * (b.getPercentToPublisher() / 100);
+            String bookPublisher = searchByPublisherEmail(b.getPublisher());
+            try {
+                statement.executeUpdate("UPDATE publisher SET earnings = earnings + '" + earningPub + "' where '" + bookPublisher  + "' = publisher.email");
+
+            } catch (SQLException sqle) {
+                System.out.println("1 Error: Could not Add to Database!");
+                System.out.println(sqle);
+                return false;
+            }
             try {
                 int buying = b.getQuantity();
                 String ISBN = b.getISBN();
@@ -424,7 +434,7 @@ public class User {
                 "  SEARCH BY: \n" +
                 "------------------");
         System.out.println(
-                "0/ To Exit\n1/ Book Name\n" +
+                "0/ Go Back\n1/ Book Name\n" +
                         "2/ Author Name\n" +
                         "3/ Publisher\n" +
                         "4/ ISBN\n" +
@@ -507,6 +517,22 @@ public class User {
         }
     }
 
+    public String searchByPublisherEmail(String publisherName) {
+        //ResultSet for books
+        ResultSet result;
+        String email ="";
+        try {
+            result = statement.executeQuery(
+                    "select book.publisher from book, publisher where book.publisher = publisher.email AND publisher.name = '" + publisherName + "'");
+            //The first statement is to get the books
+            result.next();
+            email = result.getString("publisher");
+        } catch (SQLException sqle) {
+            System.out.println("Error in getting publisher name" + sqle);
+        }
+        return email;
+    }
+
     public void searchByISBN() {
         //ResultSet for books
         ResultSet result = null;
@@ -553,11 +579,11 @@ public class User {
         while(flag) {
             String ISBN = result.getString("isbn");
             String bookName = result.getString("bookName");
-            String price = result.getString("Price");
+            float price = result.getFloat("Price");
             String publisherName = result.getString("publisherName");
             int quantityStock = result.getInt("inStock");
             int threshold = result.getInt("thresholdquantity");
-
+            float percentToPublisher = result.getFloat("percenttopublisher");
 
             System.out.println(counter + "." +
                     " ISBN: " + ISBN +
@@ -589,7 +615,7 @@ public class User {
                 tempGenre.add(result2.getString("genre"));
             }
 
-            booksSearched.add(new Book(ISBN,bookName,price,publisherName,0,quantityStock, (ArrayList<String>) tempGenre.clone(),(ArrayList<String>) tempAuthor.clone(),threshold));
+            booksSearched.add(new Book(ISBN,bookName,price,publisherName,0,quantityStock, (ArrayList<String>) tempGenre.clone(),(ArrayList<String>) tempAuthor.clone(), percentToPublisher, threshold));
 
             if (!result.next()) {
                 flag = false;
