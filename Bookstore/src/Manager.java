@@ -12,7 +12,6 @@ public class Manager {
     }
 
     public void managerLogin() {
-        Scanner input = new Scanner(System.in);
 
         try {
             Class.forName("org.postgresql.Driver");
@@ -30,13 +29,16 @@ public class Manager {
             System.out.println(e);
             bookstore.printWelcome();
         }
+        showManagerMenu();
+    }
 
-
+    private void showManagerMenu() {
+        Scanner input = new Scanner(System.in);
         System.out.println("------------------\n" +
-                "  MANAGER LOGIN \n" +
+                "  MANAGER MENU \n" +
                 "------------------\n" );
         System.out.println("0/ To Exit\n1/ Add author\n" +  "2/ Add book\n" + "3/ Delete book\n" +
-                "4/ Add publisher\n" + "5/ Generate report\n" + "6/ Logout\n");
+                "4/ Add publisher\n" + "5/ Report Sales Per Genre\n" + "6/ Report Sales Per Author\n" + "7/ Report Sales Per Publisher\n" + "8/ Report Sales vs Expenditures\n" + "9/ Log out of Manager Account\n");
         do {
             try {
                 switch ((input.nextInt())) {
@@ -61,9 +63,18 @@ public class Manager {
                         break;
 
                     case 5:
-                        generateReport();
+                        reportSalesPerGenre();
+                        break;
 
                     case 6:
+                        reportSalesPerAuthor();
+                        break;
+
+                    case 7:
+                        reportSalesPerPublisher();
+                        break;
+
+                    case 8:
                         bookstore.printWelcome();
 
                 }
@@ -445,6 +456,84 @@ public class Manager {
         }
         // only got here if we didn't return false
         return true;
+    }
+
+    public void reportSalesPerGenre(){
+        try {
+            ResultSet result = null;
+            result = statement.executeQuery("select genre, sum(quantity)\n" +
+                    "from book, \"order\" AS bookOrder, \"contains\" AS orderContains, genres\n" +
+                    "where book.isbn = orderContains.isbn AND orderContains.orderNum = bookOrder.orderNum AND book.isbn = genres.isbn\n" +
+                    "group by genre\n" +
+                    "order by sum(quantity) DESC");
+            System.out.println("\n---------------\nSales Per Genre:\n---------------\n");
+            while(result.next()){
+                System.out.println("Genre: " + result.getString("genre") + ", Sold: " + result.getString("sum") + " book(s)");
+            }
+            System.out.println("\n---------------\n");
+            Scanner input = new Scanner(System.in);
+            System.out.println("\nEnter anything to go back...");
+            if(input.hasNext()){
+                showManagerMenu();
+            }
+
+        } catch (SQLException sqle) {
+            System.out.println("Error Occurred!");
+            System.out.println(sqle);
+            showManagerMenu();
+        }
+    }
+
+    public void reportSalesPerAuthor(){
+        try {
+            ResultSet result = null;
+            result = statement.executeQuery("select author.name, author.email, sum(quantity)\n" +
+                    "from book, \"order\" AS bookOrder, \"contains\" AS orderContains, author, writtenBy\n" +
+                    "where book.isbn = orderContains.isbn AND orderContains.orderNum = bookOrder.orderNum AND book.isbn = writtenBy.isbn AND writtenBy.authEmail = author.email\n" +
+                    "group by author.name, author.email\n" +
+                    "order by sum(quantity) DESC");
+            System.out.println("\n---------------\nSales Per Author:\n---------------\n");
+            while(result.next()){
+                System.out.println("Author Name: " + result.getString("name") + ", Email: " + result.getString("email") + ", Sold: " + result.getString("sum") + " book(s)");
+            }
+            System.out.println("\n---------------\n");
+            Scanner input = new Scanner(System.in);
+            System.out.println("\nEnter anything to go back...");
+            if(input.hasNext()){
+                showManagerMenu();
+            }
+
+        } catch (SQLException sqle) {
+            System.out.println("Error Occurred!");
+            System.out.println(sqle);
+            showManagerMenu();
+        }
+    }
+
+    public void reportSalesPerPublisher(){
+        try {
+            ResultSet result = null;
+            result = statement.executeQuery("select publisher.name, publisher.email, sum(quantity)\n" +
+                    "from book, \"order\" AS bookOrder, \"contains\" AS orderContains, publisher\n" +
+                    "where book.isbn = orderContains.isbn AND orderContains.orderNum = bookOrder.orderNum AND book.publisher = publisher.email\n" +
+                    "group by publisher.name, publisher.email\n" +
+                    "order by sum(quantity) DESC");
+            System.out.println("\n---------------\nSales Per Publisher:\n---------------\n");
+            while(result.next()){
+                System.out.println("Publisher Name: " + result.getString("name") + ", Email: " + result.getString("email") + ", Sold: " + result.getString("sum") + " book(s)");
+            }
+            System.out.println("\n---------------\n");
+            Scanner input = new Scanner(System.in);
+            System.out.println("\nEnter anything to go back...");
+            if(input.hasNext()){
+                showManagerMenu();
+            }
+
+        } catch (SQLException sqle) {
+            System.out.println("Error Occurred!");
+            System.out.println(sqle);
+            showManagerMenu();
+        }
     }
 
 }
