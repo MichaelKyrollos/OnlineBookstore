@@ -143,7 +143,7 @@ After removal
 
 
 #### Add author 
-![image](https://user-images.githubusercontent.com/83596468/206866408-0debc0c7-7d92-4014-8a50-badcfd0bdf89.png)
+![image](https://user-images.githubusercontent.com/118630294/206876889-a80a9107-f277-4442-88d6-27cfcd290170.png)
 <br> [Back to documentation](#manager)
 
 #### Add book 
