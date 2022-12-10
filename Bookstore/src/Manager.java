@@ -85,7 +85,7 @@ public class Manager {
 
                     case 9:
                         bookstore.printWelcome();
-
+                        break;
                 }
             }
             catch(InputMismatchException e) {
@@ -278,7 +278,7 @@ public class Manager {
             isbn = input.nextLine();
             System.out.print("Name: ");
             name = input.nextLine();
-            System.out.print("Publisher: ");
+            System.out.print("Enter Existing Publisher E-mail: ");
             publisher = input.nextLine();
             System.out.print("Stock: ");
             quantity = input.nextLine();
