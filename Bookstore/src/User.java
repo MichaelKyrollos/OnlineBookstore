@@ -35,11 +35,11 @@ public class User {
                 "USER LOGIN \n" +
                 "------------------" );
         do {
-                System.out.println("Username:");
-                String userName = input.nextLine();
-                System.out.println("Password:");
-                String password = input.nextLine();
-                loginExistingUser(userName,password);
+            System.out.println("Username:");
+            String userName = input.nextLine();
+            System.out.println("Password:");
+            String password = input.nextLine();
+            loginExistingUser(userName,password);
         } while (input.hasNextInt());
     }
     public void newUser() {
@@ -83,11 +83,11 @@ public class User {
                     return false;
                 }
             }
-         } catch (SQLException | ClassNotFoundException sqle) {
+        } catch (SQLException | ClassNotFoundException sqle) {
             return false;
         }
         return true;
-}
+    }
     public void loginExistingUser(String userName, String password) {
         {
             try {
@@ -97,23 +97,28 @@ public class User {
                 statement = connection.createStatement();
                 statement2 = connection.createStatement();
                 result = statement.executeQuery(
-                        "select *, username AS usernames from \"user\"  where (username='" + userName + "')");
+                        "select *, username from \"user\"  where (username='" + userName + "')");
+
                 if (connection != null) {
                     try {
-                        result.next();
+                        if(result != null) {
+                            result.next();
                         if (password.equals(result.getString("password"))) {
                             System.out.println("Connection to DB successful");
                             System.out.println("Logged in");
                             this.setUsername(userName);
                             userMenu();
-                        }
+                        }}
                         else {
                             System.out.println("Failed Connection to DB");
                             bookstore.printWelcome();
                         }
+
                     }
                     catch (SQLException sqle) {
-                        System.out.println(sqle);
+                        System.out.println("Wrong password or username");
+                        bookstore.printWelcome();
+
                     }
                 }
 
@@ -130,7 +135,7 @@ public class User {
                 "  USER MENU \n" +
                 "------------------" );
         System.out.println("Hello " + getUsername());
-        System.out.println("0/ To Exit\n1/ Search\n" + "2/ Go to Cart\n" + "3/ Logout\n" );
+        System.out.println("0/ Go Back\n1/ Search\n" + "2/ Go to Cart\n" + "3/ Logout\n" );
         do {
             try {
                 switch ((input.nextInt())) {
@@ -161,10 +166,10 @@ public class User {
                 "------------------\n" );
         System.out.println(
                 "0/ Go Back\n" +
-                "1/ Place Order\n" +
-                "2/ Increase Quantity\n" +
-                "3/ Decrease Quantity\n" +
-                "4/ Remove book from Cart\n");
+                        "1/ Place Order\n" +
+                        "2/ Increase Quantity\n" +
+                        "3/ Decrease Quantity\n" +
+                        "4/ Remove book from Cart\n");
         do {
             try {
                 switch ((input.nextInt())) {
@@ -308,48 +313,48 @@ public class User {
             Scanner input = new Scanner(System.in);
             // Shipping address
             System.out.println("Would you like the shipping address to be the same as your home address? 0 for NO, 1 for YES");
-                    switch ((input.nextInt())) {
-                        case 0:
-                            Scanner address = new Scanner(System.in);
-                            System.out.println("What address would you like the order to ship to?");
-                            shippingAddress = address.nextLine();
-                            System.out.println("Done");
+            switch ((input.nextInt())) {
+                case 0:
+                    Scanner address = new Scanner(System.in);
+                    System.out.println("What address would you like the order to ship to?");
+                    shippingAddress = address.nextLine();
+                    System.out.println("Done");
 
-                            break;
-                        case 1:
-                            try {
-                                //The first statement is to get the books
-                                result = statement.executeQuery(
-                                        "select homeaddress from \"user\" where (username='" + getUsername() + "');");
-                                result.next();
-                                shippingAddress = result.getString("homeaddress");
-                                System.out.println("Shipping address is " + shippingAddress);
-                            } catch (SQLException sqle) {
-                                System.out.println("NOT WORKING!" + sqle);
-                            }
-                            break;
+                    break;
+                case 1:
+                    try {
+                        //The first statement is to get the books
+                        result = statement.executeQuery(
+                                "select homeaddress from \"user\" where (username='" + getUsername() + "');");
+                        result.next();
+                        shippingAddress = result.getString("homeaddress");
+                        System.out.println("Shipping address is " + shippingAddress);
+                    } catch (SQLException sqle) {
+                        System.out.println("NOT WORKING!" + sqle);
                     }
-                    // Billing address
-                    System.out.println("Would you like the billing address to be the same as your home address? 0 for NO, 1 for YES");
-                    switch ((input.nextInt())) {
-                        case 0:
-                            Scanner address = new Scanner(System.in);
-                            System.out.println("What billing address would you like?");
-                            billingAddress = address.nextLine();
-                            break;
-                        case 1:
-                            try {
-                                //The first statement is to get the books
-                                result = statement.executeQuery(
-                                        "select homeaddress from \"user\" where (username='" + getUsername() + "');");
-                                result.next();
-                                billingAddress = result.getString("homeaddress");
-                                System.out.println("Billing address set as " + billingAddress);
-                            } catch (SQLException sqle) {
-                                System.out.println("NOT WORKING!" + sqle);
-                            }
-                            break;
+                    break;
+            }
+            // Billing address
+            System.out.println("Would you like the billing address to be the same as your home address? 0 for NO, 1 for YES");
+            switch ((input.nextInt())) {
+                case 0:
+                    Scanner address = new Scanner(System.in);
+                    System.out.println("What billing address would you like?");
+                    billingAddress = address.nextLine();
+                    break;
+                case 1:
+                    try {
+                        //The first statement is to get the books
+                        result = statement.executeQuery(
+                                "select homeaddress from \"user\" where (username='" + getUsername() + "');");
+                        result.next();
+                        billingAddress = result.getString("homeaddress");
+                        System.out.println("Billing address set as " + billingAddress);
+                    } catch (SQLException sqle) {
+                        System.out.println("NOT WORKING!" + sqle);
                     }
+                    break;
+            }
             if (processOrder(billingAddress, shippingAddress)) {
                 booksInCart.clear();
                 System.out.println("Order Successful!");
@@ -393,6 +398,16 @@ public class User {
                 System.out.println(sqle);
                 return false;
             }
+            float earningPub = (b.getQuantity() * b.getPrice()) * (b.getPercentToPublisher() / 100);
+            String bookPublisher = searchByPublisherEmail(b.getPublisher());
+            try {
+                statement.executeUpdate("UPDATE publisher SET earnings = earnings + '" + earningPub + "' where '" + bookPublisher  + "' = publisher.email");
+
+            } catch (SQLException sqle) {
+                System.out.println("1 Error: Could not Add to Database!");
+                System.out.println(sqle);
+                return false;
+            }
             try {
                 int buying = b.getQuantity();
                 String ISBN = b.getISBN();
@@ -424,7 +439,7 @@ public class User {
                 "  SEARCH BY: \n" +
                 "------------------");
         System.out.println(
-                "0/ To Exit\n1/ Book Name\n" +
+                "0/ Go Back\n1/ Book Name\n" +
                         "2/ Author Name\n" +
                         "3/ Publisher\n" +
                         "4/ ISBN\n" +
@@ -452,9 +467,9 @@ public class User {
                         break;
                 }
             }catch(InputMismatchException e){
-                    System.out.println("Please enter a valid input");
-                    userSearch();
-                }
+                System.out.println("Please enter a valid input");
+                userSearch();
+            }
 
         }while(!input.hasNextInt());
     }
@@ -507,6 +522,22 @@ public class User {
         }
     }
 
+    public String searchByPublisherEmail(String publisherName) {
+        //ResultSet for books
+        ResultSet result;
+        String email ="";
+        try {
+            result = statement.executeQuery(
+                    "select book.publisher from book, publisher where book.publisher = publisher.email AND publisher.name = '" + publisherName + "'");
+            //The first statement is to get the books
+            result.next();
+            email = result.getString("publisher");
+        } catch (SQLException sqle) {
+            System.out.println("Error in getting publisher name" + sqle);
+        }
+        return email;
+    }
+
     public void searchByISBN() {
         //ResultSet for books
         ResultSet result = null;
@@ -553,11 +584,11 @@ public class User {
         while(flag) {
             String ISBN = result.getString("isbn");
             String bookName = result.getString("bookName");
-            String price = result.getString("Price");
+            float price = result.getFloat("Price");
             String publisherName = result.getString("publisherName");
             int quantityStock = result.getInt("inStock");
             int threshold = result.getInt("thresholdquantity");
-
+            float percentToPublisher = result.getFloat("percenttopublisher");
 
             System.out.println(counter + "." +
                     " ISBN: " + ISBN +
@@ -565,7 +596,7 @@ public class User {
                     ", Price: " + price +
                     ", Publisher: " + publisherName +
                     ", Pages: " + result.getString("pages") +
-                     ", Quantity in stock: " + quantityStock);
+                    ", Quantity in stock: " + quantityStock);
 
             counter++;
             //This second statement is to get the author(s) of this book
@@ -589,7 +620,7 @@ public class User {
                 tempGenre.add(result2.getString("genre"));
             }
 
-            booksSearched.add(new Book(ISBN,bookName,price,publisherName,0,quantityStock, (ArrayList<String>) tempGenre.clone(),(ArrayList<String>) tempAuthor.clone(),threshold));
+            booksSearched.add(new Book(ISBN,bookName,price,publisherName,0,quantityStock, (ArrayList<String>) tempGenre.clone(),(ArrayList<String>) tempAuthor.clone(), percentToPublisher, threshold));
 
             if (!result.next()) {
                 flag = false;
