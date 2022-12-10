@@ -75,6 +75,7 @@ public class Manager {
                         break;
 
                     case 8:
+                        reportSalesExpenditures();
                         bookstore.printWelcome();
 
                 }
@@ -85,6 +86,36 @@ public class Manager {
             }
 
         } while (!input.hasNextInt());
+    }
+
+    private void reportSalesExpenditures() {
+        ResultSet result = null;
+        float revenue = 0;
+        float royalty = 0;
+        try {
+            result = statement.executeQuery("SELECT * from book");
+            //System.out.println("Successfully added to Database!");
+            while(result.next()) {
+                revenue += result.getInt("amountsoldhistory") * result.getFloat("price");
+            }
+        } catch (SQLException sqle) {
+            System.out.println("Error: Could not Add to Database!");
+            System.out.println(sqle);
+        }
+        System.out.println("Bookstore revenue: $"+ revenue);
+        try {
+            result = statement.executeQuery("SELECT * from publisher");
+            //System.out.println("Successfully added to Database!");
+            while(result.next()) {
+                royalty += result.getFloat("earnings");
+            }
+        } catch (SQLException sqle) {
+            System.out.println("Error: Could not Add to Database!");
+            System.out.println(sqle);
+        }
+        System.out.println("Bookstore expenditure: $"+ royalty);
+        float profit = revenue - royalty;
+        System.out.println("The bookstore profit: $" +profit);
     }
 
 
