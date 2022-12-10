@@ -199,7 +199,7 @@ public class User {
                     "where bookOrder.username = " +"'" + username + "'");
             System.out.println("\n---------------\nOrder(s) By "+ username +":\n---------------\n");
             while(result.next()){
-                System.out.println("Order/Tracking Number: " + result.getString("orderNum") + ", Shipping Address: " + result.getString("shippingaddress") + ", Billing Address: " + result.getString("billingaddress") + " Ordered By: " + result.getString("username"));
+                System.out.println("Order/Tracking Number: " + result.getString("orderNum") + ", Shipping Address: " + result.getString("shippingaddress") + ", Billing Address: " + result.getString("billingaddress") + ", Ordered By: " + result.getString("username"));
                 result2 = statement2.executeQuery("select *\n" +
                         "from \"contains\" AS orderContains, book\n" +
                         "where book.isbn = orderContains.isbn AND orderContains.orderNum = " + "'" + result.getString("orderNum") + "'");
