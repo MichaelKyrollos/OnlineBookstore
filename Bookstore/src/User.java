@@ -135,12 +135,12 @@ public class User {
                 "  USER MENU \n" +
                 "------------------" );
         System.out.println("Hello " + getUsername());
-        System.out.println("0/ Go Back\n1/ Search\n" + "2/ Go to Cart\n" + "3/ Logout\n" );
+        System.out.println("0/ Go Back\n1/ Search\n" + "2/ Go to Cart\n" + "3/ Show Orders\n"  + "4/ Logout\n");
         do {
             try {
                 switch ((input.nextInt())) {
                     case 0:
-                    case 3:
+                    case 4:
                         bookstore.printWelcome();
                         break;
                     case 1:
@@ -148,6 +148,9 @@ public class User {
                         break;
                     case 2:
                         showCartMenu();
+                        break;
+                    case 3:
+                        showOrders();
                         break;
                 }
             }
@@ -159,11 +162,61 @@ public class User {
         } while (!input.hasNextInt());
     }
 
+    private void showOrders() {
+        try {
+            ResultSet result = null;
+            ResultSet result2 = null;
+            int counter = 0;
+            result = statement.executeQuery("select *\n" +
+                    "from \"order\" AS bookOrder\n" +
+                    "where bookOrder.username = " +"'" + username + "'");
+            System.out.println("\n---------------\nOrder(s) By "+ username +":\n---------------\n");
+            while(result.next()){
+                System.out.println("Order/Tracking Number: " + result.getString("orderNum") + ", Shipping Address: " + result.getString("shippingaddress") + ", Billing Address: " + result.getString("billingaddress") + " Ordered By: " + result.getString("username"));
+                result2 = statement2.executeQuery("select *\n" +
+                        "from \"contains\" AS orderContains, book\n" +
+                        "where book.isbn = orderContains.isbn AND orderContains.orderNum = " + "'" + result.getString("orderNum") + "'");
+                while(result2.next()) {
+                    String ISBN = result2.getString("isbn");
+                    String bookName = result2.getString("name");
+                    float price = result2.getFloat("Price");
+                    String publisherName = result2.getString("publisher");
+
+                    System.out.println("        " + counter + "." +
+                            " ISBN: " + ISBN +
+                            ", Book Name: " + bookName +
+                            ", Price: " + price +
+                            ", Publisher: " + publisherName +
+                            ", Pages: " + result2.getString("pages") +
+                            "  x" + result2.getString("quantity"));
+
+                    counter++;
+                }
+
+            }
+            System.out.println("\n---------------\n");
+            Scanner input = new Scanner(System.in);
+            System.out.println("\nEnter anything to go back...");
+            if(input.hasNext()){
+                userMenu();
+            }
+
+        } catch (SQLException sqle) {
+            System.out.println("Error Occurred!");
+            System.out.println(sqle);
+            userMenu();
+        }
+    }
+
     public void showCartMenu() {
         Scanner input = new Scanner(System.in);
         System.out.println("\n------------------\n" +
                 "  USER CART \n" +
                 "------------------\n" );
+
+        System.out.println("Showing cart...");
+        showCartItems();
+
         System.out.println(
                 "0/ Go Back\n" +
                         "1/ Place Order\n" +
