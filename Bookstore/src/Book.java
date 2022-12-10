@@ -3,18 +3,16 @@ import java.util.ArrayList;
 public class Book {
     private String ISBN;
     private String name;
-    private String price;
+    private float price;
     private String publisher;
     private int quantityToBuy;
     private int inStock;
     private ArrayList<String> genre;
     private ArrayList<String> author;
-
-
-
+    private float percentToPublisher;
     private int threshold;
 
-    public Book(String ISBN, String name, String price, String publisher, int quantityToBuy, int inStock, ArrayList<String> genre, ArrayList<String> author,int threshold) {
+    public Book(String ISBN, String name, float price, String publisher, int quantityToBuy, int inStock, ArrayList<String> genre, ArrayList<String> author, float percentToPublisher, int threshold) {
         this.ISBN = ISBN;
         this.name = name;
         this.price = price;
@@ -23,12 +21,17 @@ public class Book {
         this.inStock = inStock;
         this.genre = genre;
         this.author = author;
+        this.percentToPublisher = percentToPublisher;
         this.threshold = threshold;
     }
 
+    public String getPublisher() {return publisher; }
+
+    public float getPercentToPublisher() { return percentToPublisher;}
     public void setQuantityToBuy(int quantityToBuy) {
         this.quantityToBuy = quantityToBuy;
     }
+    public float getPrice() { return price;}
     public int getQuantity(){ return quantityToBuy ;}
     public String getISBN() {return ISBN;}
     public int getInStock() {
@@ -40,7 +43,7 @@ public class Book {
 
     public int computeUpdatedStock() {
         int updatedStock = 0;
-       // decrease the stock
+        // decrease the stock
         if (thresholdRestock()) {
             updatedStock = getThreshold() * 2;
         } else {
