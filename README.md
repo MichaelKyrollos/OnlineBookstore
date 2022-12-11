@@ -12,7 +12,8 @@ The system uses SQL queries to access book information stored in a pgAdmin Datab
 1. Using pgAdmin, create a new database with the name ``OnlineBookstore``
 2. Ensure that the database password is ``admin``, this password is different from the pgAdmin master password. Click [here](https://help.alteryx.com/20212/alteryx-analytics-hub/change-postgres-admin-password) to learn more. 
 3. Ensure the database username is ``postgres``, this is the default name
-2. Run the program (From Bookstore.java)     
+4. When opening the files ensure that is is opened as a project in IntelliJ: *File->Open*, then navigate to the folder [where the code is](#project-folder)
+5. Run the program (From Bookstore.java)     
           - This project uses SDK version 19
           <br>- Project was created using IntelliJ IDEA.
           <br>- Ensure to compile and build project before running Project *Build->Build Project*
@@ -36,6 +37,7 @@ A user models a customer for the online bookstore, each customer must have an ac
       - The books in the cart will be used to create an order which is stored in the database
       - Cart will be emptied
       - The user can add more items to the now empty cart if he/she desires. This will create a seperate order in the database when processed
+      - In the database, a book is restocked when it gets below the threshold amount that is set
 4. [View all orders](#view-all-orders) currently associated with the user who is logged in 
 5. Logout - this will bring the session back the main interface
                               
@@ -56,6 +58,10 @@ A user models the bookstore owner. In this menu, no username or password are req
 
 --------------------------------------------------------------------------------------------------------
 *Screenshots*
+## Project folder
+<br>![image](https://user-images.githubusercontent.com/83596468/206918233-d0fb6715-a94c-42d7-83d7-89e306b0d657.png)
+<br> [Go to top](#onlinebookstore)
+
 ## Main Interface
 ![image](https://user-images.githubusercontent.com/83596468/206866408-0debc0c7-7d92-4014-8a50-badcfd0bdf89.png)
 <br> [Go to top](#onlinebookstore)
