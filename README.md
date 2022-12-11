@@ -8,14 +8,15 @@ The system uses SQL queries to access book information stored in a pgAdmin Datab
 
 
 ## How to run project: 
+**Applications that are necessary to run the application:** [IntelliJ](https://www.jetbrains.com/idea/) and [pgAdmin](https://www.pgadmin.org/download/)
 1. Using pgAdmin, create a new database with the name ``OnlineBookstore``
 2. Ensure that the database password is ``admin``, this password is different from the pgAdmin master password. Click [here](https://help.alteryx.com/20212/alteryx-analytics-hub/change-postgres-admin-password) to learn more. 
 3. Ensure the database username is ``postgres``, this is the default name
 2. Run the program (From Bookstore.java)     
           - This project uses SDK version 19
-          - Project was created using IntelliJ IDEA
-          - Ensure to compile and build project before running Project *Build->Build Project*
-          - For compile (this may not be necessary): *Build->Compile [filename].java*. You may need to do this for each file if running doesn't initially work
+          <br>- Project was created using IntelliJ IDEA.
+          <br>- Ensure to compile and build project before running Project *Build->Build Project*
+          <br>- For compile (this may not be necessary): *Build->Compile [filename].java*. You may need to do this for each file if running doesn't initially work
 ## User
 A user models a customer for the online bookstore, each customer must have an account to use [the system](#user-menu) by either [creating an account](#creating-an-account) or logging in using an [existing acccount](#existing-account). The login requires a valid username and password, the system will ensure that both are valid when a user attempts to login. 
 
